@@ -3,7 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zensta — AI Automation for Small Businesses</title>
+    <title>Zensta — AI Automation for Small Businesses | AI Chatbot & Receptionist</title>
+    <meta name="description" content="AI-powered chatbots, phone agents, and workflow automation for small businesses. AI receptionist for dental practices, med spas, real estate. Setup in days, from $149/mo. No contracts.">
+    <meta name="keywords" content="AI automation small business, AI chatbot dental practice, AI receptionist, AI phone agent, workflow automation, n8n workflow templates, small business AI, 24/7 virtual receptionist">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://kartik-gupta-spyne.github.io/zensta-site/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Zensta — AI Automation for Small Businesses">
+    <meta property="og:description" content="AI chatbots, phone agents, and workflow automation that handle your front desk 24/7. Setup in days, not months. From $149/mo.">
+    <meta property="og:url" content="https://kartik-gupta-spyne.github.io/zensta-site/">
+    <meta property="og:site_name" content="Zensta">
+    <meta property="og:image" content="https://kartik-gupta-spyne.github.io/zensta-site/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Zensta — AI Automation for Small Businesses">
+    <meta name="twitter:description" content="AI chatbots, phone agents, and workflow automation that handle your front desk 24/7. From $149/mo.">
+    <meta name="twitter:image" content="https://kartik-gupta-spyne.github.io/zensta-site/og-image.png">
+
+    <!-- JSON-LD Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Zensta",
+        "url": "https://kartik-gupta-spyne.github.io/zensta-site/",
+        "logo": "https://kartik-gupta-spyne.github.io/zensta-site/og-image.png",
+        "description": "AI-powered chatbots, phone agents, and workflow automation for small businesses.",
+        "email": "hello@zensta.work",
+        "sameAs": [],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "hello@zensta.work",
+            "contactType": "sales"
+        }
+    }
+    </script>
+
+    <!-- JSON-LD Structured Data: WebSite -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Zensta",
+        "url": "https://kartik-gupta-spyne.github.io/zensta-site/",
+        "description": "AI automation tools and services for small businesses",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://kartik-gupta-spyne.github.io/zensta-site/tools.html",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <!-- JSON-LD Structured Data: Service offerings -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "AI Automation",
+        "provider": {
+            "@type": "Organization",
+            "name": "Zensta"
+        },
+        "name": "AI Automation for Small Businesses",
+        "description": "AI-powered chatbots, phone agents, and workflow automation that handle your front desk 24/7.",
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Starter Plan",
+                "price": "149",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "149",
+                    "priceCurrency": "USD",
+                    "billingDuration": "P1M"
+                },
+                "description": "Website chat agent for small businesses"
+            },
+            {
+                "@type": "Offer",
+                "name": "Professional Plan",
+                "price": "349",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "349",
+                    "priceCurrency": "USD",
+                    "billingDuration": "P1M"
+                },
+                "description": "Chat + phone agent for growing businesses"
+            },
+            {
+                "@type": "Offer",
+                "name": "Custom Plan",
+                "price": "599",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "599",
+                    "priceCurrency": "USD",
+                    "billingDuration": "P1M"
+                },
+                "description": "Full automation suite, tailored to you"
+            }
+        ],
+        "areaServed": "US",
+        "audience": {
+            "@type": "Audience",
+            "audienceType": "Small Business Owners"
+        }
+    }
+    </script>
+
     <style>
         :root {
             --primary: #1a1a2e;
@@ -44,6 +161,19 @@
             text-decoration: none;
         }
         .logo span { color: var(--accent); }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: var(--accent); }
         .nav-cta {
             background: var(--accent);
             color: white;
@@ -302,16 +432,45 @@
 
         /* Footer */
         footer {
-            padding: 24px 0;
-            text-align: center;
+            padding: 48px 0 24px;
             color: var(--text-light);
             font-size: 0.85rem;
             border-top: 1px solid var(--border);
         }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+        .footer-col h4 {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .footer-col a {
+            display: block;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 3px 0;
+            font-size: 0.88rem;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
 
+        @media (max-width: 768px) {
+            .nav-links { gap: 12px; }
+            .nav-link { font-size: 0.85rem; }
+        }
         @media (max-width: 640px) {
             .hero h1 { font-size: 2rem; }
             .hero { padding: 48px 0 40px; }
+            .nav-links .nav-link { display: none; }
         }
     </style>
 </head>
@@ -319,8 +478,13 @@
 
 <nav>
     <div class="container">
-        <a href="#" class="logo">zen<span>sta</span></a>
-        <a href="#pricing" class="nav-cta">Get Started</a>
+        <a href="/" class="logo">zen<span>sta</span></a>
+        <div class="nav-links">
+            <a href="/tools.html" class="nav-link">Free Tools</a>
+            <a href="/templates.html" class="nav-link">Templates</a>
+            <a href="/demo.html" class="nav-link">Live Demo</a>
+            <a href="#pricing" class="nav-cta">Get Started</a>
+        </div>
     </div>
 </nav>
 
@@ -463,7 +627,34 @@
 
 <footer>
     <div class="container">
-        <p>&copy; 2026 Zensta. All rights reserved.</p>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Services</h4>
+                <a href="#pricing">AI Chat Agent</a>
+                <a href="#pricing">AI Phone Agent</a>
+                <a href="#pricing">Workflow Automation</a>
+            </div>
+            <div class="footer-col">
+                <h4>Free Tools</h4>
+                <a href="/tools.html">All Tools</a>
+                <a href="/replypro.html">ReplyPro - Review Replies</a>
+                <a href="/nameforge.html">NameForge - Business Names</a>
+            </div>
+            <div class="footer-col">
+                <h4>Demos</h4>
+                <a href="/demo.html">Dental AI Receptionist</a>
+                <a href="/demo-medspa.html">Med Spa AI Concierge</a>
+                <a href="/demo-realestate.html">Real Estate AI Assistant</a>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <a href="/templates.html">n8n Workflow Templates</a>
+                <a href="mailto:hello@zensta.work">Contact Us</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Zensta. All rights reserved.</p>
+        </div>
     </div>
 </footer>
 
