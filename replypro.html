@@ -1213,6 +1213,87 @@ footer {
   .social-proof { flex-direction: column; gap: 12px; }
   .social-proof-divider { display: none; }
 }
+
+/* ===== GTM: SHARE BANNER ===== */
+.share-banner {
+  display: none;
+  background: linear-gradient(135deg, var(--emerald-50), var(--emerald-100));
+  border: 1px solid var(--emerald-200);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 20px;
+  text-align: center;
+  animation: fadeInUp 0.4s ease;
+}
+.share-banner.visible { display: block; }
+.share-banner h4 {
+  font-size: 1rem;
+  color: var(--emerald-800);
+  margin-bottom: 4px;
+}
+.share-banner p {
+  font-size: 0.85rem;
+  color: var(--emerald-700);
+  margin-bottom: 14px;
+}
+.share-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  color: #fff;
+}
+.share-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.share-btn.twitter { background: #1da1f2; }
+.share-btn.linkedin { background: #0a66c2; }
+.share-btn.copy-link { background: var(--emerald-600); }
+.share-btn svg { width: 16px; height: 16px; }
+.share-bonus {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--emerald-600);
+  font-weight: 600;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+.share-bonus.visible { display: block; }
+
+/* ===== GTM: POWERED BY BADGE ===== */
+.powered-badge {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-decoration: none;
+  z-index: 9999;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.powered-badge:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  color: var(--emerald-700);
+}
 </style>
 </head>
 <body>
@@ -1418,6 +1499,17 @@ footer {
             Your Generated Replies
           </div>
           <div id="repliesOutput"></div>
+          <!-- GTM: Share Banner -->
+          <div class="share-banner" id="shareBanner">
+            <h4>Share this tool to get 3 more free replies!</h4>
+            <p>Help a fellow business owner discover ReplyPro</p>
+            <div class="share-buttons">
+              <button class="share-btn twitter" onclick="shareOnTwitter()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Tweet</button>
+              <button class="share-btn linkedin" onclick="shareOnLinkedIn()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share</button>
+              <button class="share-btn copy-link" onclick="copyShareLink()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copy Link</button>
+            </div>
+            <div class="share-bonus" id="shareBonus">+3 free replies added! Thank you for sharing.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2021,6 +2113,9 @@ function generateReply() {
 
     outputSection.classList.add('visible');
 
+    // GTM: Show share banner after results
+    showShareBanner();
+
     // Show success message if low on replies
     const newRemaining = getRemainingReplies();
     if (newRemaining <= 2 && newRemaining > 0) {
@@ -2125,6 +2220,93 @@ window.addEventListener('scroll', () => {
 
 // ===== INIT =====
 updateCounter();
+
+// ===== GTM: REFERRAL TRACKING =====
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('ref') === 'share') {
+    console.log('[GTM] Referral visit detected via ?ref=share', {
+      tool: 'ReplyPro',
+      timestamp: new Date().toISOString(),
+      referrer: document.referrer || 'direct'
+    });
+  }
+})();
+
+// ===== GTM: SHARE-TO-UNLOCK =====
+const SHARE_URL = 'https://zensta.work/replypro.html?ref=share';
+const SHARE_TEXT = 'Just used this free AI tool to write a perfect Google review response in 3 seconds \u{1F92F} Try it: ' + SHARE_URL;
+
+function showShareBanner() {
+  const banner = document.getElementById('shareBanner');
+  if (banner) banner.classList.add('visible');
+}
+
+function addShareBonus() {
+  const data = getUsageData();
+  const month = getCurrentMonth();
+  if (!data || data.month !== month) return;
+  // Only grant bonus once per month
+  if (data.shareBonus) return;
+  data.used = Math.max(0, data.used - 3);
+  data.shareBonus = true;
+  localStorage.setItem('replypro_usage', JSON.stringify(data));
+  updateCounter();
+  const bonus = document.getElementById('shareBonus');
+  if (bonus) bonus.classList.add('visible');
+}
+
+function shareOnTwitter() {
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(SHARE_TEXT), '_blank', 'width=550,height=420');
+  addShareBonus();
+}
+
+function shareOnLinkedIn() {
+  window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(SHARE_URL), '_blank', 'width=550,height=420');
+  addShareBonus();
+}
+
+function copyShareLink() {
+  navigator.clipboard.writeText(SHARE_URL).then(() => {
+    const btn = document.querySelector('.share-btn.copy-link');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copy Link'; }, 2000); }
+    addShareBonus();
+  }).catch(() => {});
+}
+
+// ===== GTM: RESULT WATERMARK (override copy) =====
+const _origCopyReply = copyReply;
+copyReply = function(btn, index) {
+  const replyCards = document.querySelectorAll('.reply-text');
+  const text = replyCards[index].textContent + '\n\n\u2014 Generated with ReplyPro by Zensta (zensta.work)';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
+    }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
+    }, 2000);
+  });
+};
 </script>
+
+<!-- GTM: Powered by Zensta badge -->
+<a href="https://zensta.work/tools.html" class="powered-badge" target="_blank">&#9889; Powered by Zensta</a>
+
 </body>
 </html>

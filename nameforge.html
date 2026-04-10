@@ -694,6 +694,90 @@
             .pricing-section { padding: 56px 0 40px; }
             .paywall-card { padding: 32px 24px; }
         }
+
+        /* ===== GTM: SHARE BANNER ===== */
+        .share-banner {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+        .share-banner.visible { display: block; }
+        .share-banner h4 {
+            font-size: 1rem;
+            color: var(--accent-light);
+            margin-bottom: 4px;
+        }
+        .share-banner p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            text-decoration: none;
+            color: #fff;
+        }
+        .share-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .share-btn.twitter { background: #1da1f2; }
+        .share-btn.linkedin { background: #0a66c2; }
+        .share-btn.copy-link { background: var(--accent); }
+        .share-btn svg { width: 16px; height: 16px; }
+        .share-bonus {
+            display: none;
+            font-size: 0.8rem;
+            color: var(--green);
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .share-bonus.visible { display: block; }
+
+        /* ===== GTM: POWERED BY BADGE ===== */
+        .powered-badge {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(19, 18, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            z-index: 9999;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .powered-badge:hover {
+            box-shadow: 0 4px 12px rgba(124,58,237,0.2);
+            transform: translateY(-1px);
+            color: var(--accent-light);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -764,6 +848,17 @@
                 </div>
                 <div id="namesList"></div>
                 <button class="btn-generate" style="margin-top:16px" onclick="handleGenerate()">Generate More</button>
+                <!-- GTM: Share Banner -->
+                <div class="share-banner" id="shareBanner">
+                    <h4>Share this tool to get 3 more free generations!</h4>
+                    <p>Help a fellow entrepreneur find the perfect business name</p>
+                    <div class="share-buttons">
+                        <button class="share-btn twitter" onclick="shareOnTwitter()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Tweet</button>
+                        <button class="share-btn linkedin" onclick="shareOnLinkedIn()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share</button>
+                        <button class="share-btn copy-link" onclick="copyShareLink()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copy Link</button>
+                    </div>
+                    <div class="share-bonus" id="shareBonus">+3 free generations added! Thank you for sharing.</div>
+                </div>
             </div>
 
             <!-- Loading -->
@@ -877,7 +972,7 @@ const WORD_BANKS = {
         classic: ['& Co','Group','House','Works','Partners','Guild','Society','Collective','Firm','Trust'],
         playful: ['zy','oo','pop','bot','boo','ful','ster','doo','bee','topia'],
         bold: ['force','strike','works','corp','prime','max','edge','x','pro','elite'],
-        minimal: ['','co','so','to','do','go','nu','mu','la','ra']
+        minimal: ['','co','.co','.io','.so','ly','up','in','la','go']
     },
 
     // ---- TAGLINE TEMPLATES ----
@@ -1017,13 +1112,47 @@ function extractKeywords(description) {
     return [...new Set(words)];
 }
 
+function hasVowel(str) {
+    return /[aeiou]/i.test(str);
+}
+
+function isPronounceable(str) {
+    // Reject 3+ consecutive consonants
+    if (/[^aeiou]{3,}/i.test(str)) return false;
+    // Must have at least 2 vowels for names 5+ chars
+    const vowelCount = (str.match(/[aeiou]/gi) || []).length;
+    if (str.length >= 5 && vowelCount < 2) return false;
+    // Must contain at least one vowel
+    return hasVowel(str);
+}
+
 function makePortmanteau(word1, word2) {
     const w1 = word1.toLowerCase();
     const w2 = word2.toLowerCase();
-    // Take first part of word1 and last part of word2
-    const cut1 = Math.max(2, Math.ceil(w1.length * 0.6));
-    const cut2 = Math.max(2, Math.floor(w2.length * 0.5));
-    return capitalize(w1.slice(0, cut1) + w2.slice(w2.length - cut2));
+    if (w1 === w2) return capitalize(w1);
+
+    const vowels = 'aeiou';
+    // Find a good cut point in w1 (after a vowel)
+    let cut1 = Math.max(3, Math.ceil(w1.length * 0.55));
+    // Adjust cut1 to land after a vowel if possible
+    for (let i = cut1; i >= 2; i--) {
+        if (vowels.includes(w1[i - 1])) { cut1 = i; break; }
+    }
+    // Find a good start point in w2 (at a consonant after skipping start)
+    let start2 = Math.max(1, Math.floor(w2.length * 0.4));
+    for (let i = start2; i < w2.length - 1; i++) {
+        if (!vowels.includes(w2[i]) && vowels.includes(w2[i+1]||'')) { start2 = i; break; }
+    }
+
+    const candidates = [
+        w1.slice(0, cut1) + w2.slice(start2),                          // Blend
+        w1.slice(0, cut1) + w2.slice(-3),                              // Start + tail
+        w1.slice(0, Math.ceil(w1.length * 0.5)) + 'a' + w2.slice(-3), // With linking vowel
+        w1 + w2.slice(-2),                                             // Full + tiny tail
+    ].filter(c => c.length >= 5 && c.length <= 13 && isPronounceable(c));
+
+    const result = candidates.length > 0 ? candidates[0] : w1.slice(0, cut1) + 'a' + w2.slice(-2);
+    return capitalize(result);
 }
 
 function generateNames(description, industry, style) {
@@ -1066,11 +1195,18 @@ function generateNames(description, industry, style) {
         if (name) results.push({ name, tagline: pick(taglines) });
     }
 
-    // Pattern 3: Portmanteau from two roots — e.g. "Syncloud", "Pixelon"
+    // Pattern 3: Compound brand names — [Root][Root] e.g. "BloomArk", "GlowVine"
     for (let i = 0; i < 3; i++) {
         const r1 = shuffledRoots[(i + 7) % shuffledRoots.length];
         const r2 = shuffledRoots[(i + 10) % shuffledRoots.length];
-        const name = addName(makePortmanteau(r1, r2));
+        const combined = r1 + r2.toLowerCase();
+        // If combined is too long, shorten the first word
+        let name;
+        if (combined.length <= 14) {
+            name = addName(r1 + r2);
+        } else {
+            name = addName(r1.slice(0, 4) + r2);
+        }
         if (name) results.push({ name, tagline: pick(taglines) });
     }
 
@@ -1080,23 +1216,30 @@ function generateNames(description, industry, style) {
             const kw = capitalize(pick(keywords));
             const variant = Math.random();
             let name;
-            if (variant < 0.33) {
-                name = addName(kw + pick(suffixes));
-            } else if (variant < 0.66) {
+            if (variant < 0.25) {
+                const suf = pick(suffixes);
+                const sep = suf.startsWith('&') || suf.startsWith(' ') ? ' ' : '';
+                name = addName(kw + sep + suf);
+            } else if (variant < 0.5) {
                 name = addName(pick(prefixes) + kw);
+            } else if (variant < 0.75) {
+                // Branded ending on keyword
+                const stem = kw.toLowerCase().replace(/[aeiou]$/,'');
+                name = addName(capitalize(stem + pick(['era','ova','ium','ara','ine','ica','ora','iva'])));
             } else {
-                name = addName(makePortmanteau(kw, pick(roots)));
+                name = addName(kw + ' ' + pick(roots));
             }
             if (name) results.push({ name, tagline: pick(taglines) });
         }
     }
 
-    // Pattern 5: [Root] + connector + [Root fragment] — e.g. "Sparkion", "Bloomaris"
+    // Pattern 5: [Root] + ending — branded suffix names e.g. "Bloomera", "Sparkion"
+    const brandEndings = ['era','ova','ium','ara','ine','ica','ora','ell','iva','ana','eon','ado','ura','ida'];
     for (let i = 0; i < 3; i++) {
         const root = shuffledRoots[(i + 13) % shuffledRoots.length];
-        const conn = pick(connectors);
-        const frag = shuffledRoots[(i + 16) % shuffledRoots.length].slice(0, 3).toLowerCase();
-        const name = addName(root + conn + frag);
+        const ending = pick(brandEndings);
+        const combined = root.toLowerCase().replace(/[aeiou]$/,'') + ending;
+        const name = addName(capitalize(combined));
         if (name) results.push({ name, tagline: pick(taglines) });
     }
 
@@ -1119,9 +1262,11 @@ function generateNames(description, industry, style) {
         } else if (pattern === 1) {
             name = addName(pick(prefixes) + pick(roots));
         } else if (pattern === 2) {
-            name = addName(makePortmanteau(pick(roots), pick(roots)));
+            // Branded ending — reliable and always pronounceable
+            const r = pick(roots).toLowerCase().replace(/[aeiou]$/,'');
+            name = addName(capitalize(r + pick(brandEndings)));
         } else {
-            name = addName(pick(roots) + pick(connectors) + pick(roots).slice(0,3).toLowerCase());
+            name = addName(pick(prefixes) + ' ' + pick(roots));
         }
         if (name) results.push({ name, tagline: pick(taglines) });
     }
@@ -1220,6 +1365,9 @@ function renderResults(names) {
 
     document.getElementById('resultsCount').textContent = names.length + ' names generated';
     document.getElementById('resultsArea').style.display = 'block';
+
+    // GTM: Show share banner after results
+    showShareBanner();
 }
 
 function handleGenerate() {
@@ -1271,6 +1419,60 @@ function handleGenerate() {
 
 // Init
 updateCounter();
+
+// ===== GTM: REFERRAL TRACKING =====
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('ref') === 'share') {
+        console.log('[GTM] Referral visit detected via ?ref=share', {
+            tool: 'NameForge',
+            timestamp: new Date().toISOString(),
+            referrer: document.referrer || 'direct'
+        });
+    }
+})();
+
+// ===== GTM: SHARE-TO-UNLOCK =====
+const SHARE_URL = 'https://zensta.work/nameforge.html?ref=share';
+const SHARE_TEXT = 'Just found this free AI business name generator \u2014 gave me 10 creative names with domain checks in seconds \u{1F525} Try it: ' + SHARE_URL;
+
+function showShareBanner() {
+    const banner = document.getElementById('shareBanner');
+    if (banner) banner.classList.add('visible');
+}
+
+function addShareBonus() {
+    const key = STORAGE_KEY + '_shared';
+    if (localStorage.getItem(key)) return; // Only once
+    const count = getGenCount();
+    setGenCount(Math.max(0, count - 3));
+    localStorage.setItem(key, '1');
+    updateCounter();
+    const bonus = document.getElementById('shareBonus');
+    if (bonus) bonus.classList.add('visible');
+}
+
+function shareOnTwitter() {
+    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(SHARE_TEXT), '_blank', 'width=550,height=420');
+    addShareBonus();
+}
+
+function shareOnLinkedIn() {
+    window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(SHARE_URL), '_blank', 'width=550,height=420');
+    addShareBonus();
+}
+
+function copyShareLink() {
+    navigator.clipboard.writeText(SHARE_URL).then(() => {
+        const btn = document.querySelector('.share-btn.copy-link');
+        if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copy Link'; }, 2000); }
+        addShareBonus();
+    }).catch(() => {});
+}
 </script>
+
+<!-- GTM: Powered by Zensta badge -->
+<a href="https://zensta.work/tools.html" class="powered-badge" target="_blank">&#9889; Powered by Zensta</a>
+
 </body>
 </html>
