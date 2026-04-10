@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubjectLine Pro — AI Email Subject Line Analyzer & Generator</title>
+<meta name="description" content="Write email subject lines that actually get opened. AI-powered analysis scores your subject lines 1-100 and generates high-converting alternatives. Free to try.">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fffaf5;
+  --bg-deep: #0f0b07;
+  --bg-card: #1a1510;
+  --bg-card-alt: #231d14;
+  --bg-surface: #2a2218;
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+  --accent-warm: #f97316;
+  --accent-hot: #ef4444;
+  --accent-glow: rgba(245, 158, 11, 0.25);
+  --accent-gradient: linear-gradient(135deg, #f97316, #f59e0b, #eab308);
+  --accent-gradient-hot: linear-gradient(135deg, #ef4444, #f97316, #f59e0b);
+  --text: #fef3e2;
+  --text-muted: #b8a48a;
+  --text-dim: #7a6b57;
+  --border: rgba(245, 158, 11, 0.12);
+  --border-active: rgba(245, 158, 11, 0.35);
+  --green: #34d399;
+  --green-bg: rgba(52, 211, 153, 0.1);
+  --green-text: #6ee7b7;
+  --red: #f87171;
+  --red-bg: rgba(248, 113, 113, 0.1);
+  --red-text: #fca5a5;
+  --yellow: #fbbf24;
+  --yellow-bg: rgba(251, 191, 36, 0.1);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96, 165, 250, 0.1);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px rgba(245, 158, 11, 0.15);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background:
+    radial-gradient(ellipse at 25% 15%, rgba(249, 115, 22, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 75%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(234, 179, 8, 0.03) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* === ANIMATIONS === */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes gaugeAnim {
+  from { stroke-dashoffset: 283; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes copyFlash {
+  0% { background: var(--green); transform: scale(1); }
+  50% { background: var(--green-text); transform: scale(1.05); }
+  100% { background: var(--green); transform: scale(1); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); max-height: 0; }
+  to { opacity: 1; transform: translateY(0); max-height: 800px; }
+}
+@keyframes barFill {
+  from { width: 0; }
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* === NAV === */
+nav {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 11, 7, 0.85);
+}
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent-gradient);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.3);
+}
+.logo span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-links { display: flex; gap: 8px; align-items: center; }
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--text); background: rgba(245, 158, 11, 0.08); }
+.nav-cta {
+  background: var(--accent-gradient);
+  color: #000;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35); }
+
+/* === HERO === */
+.hero {
+  text-align: center;
+  padding: 72px 0 48px;
+  animation: fadeInUp 0.8s ease;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-light);
+  margin-bottom: 24px;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.hero h1 .gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 560px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 32px;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+/* === TABS === */
+.tabs-section {
+  padding: 0 0 48px;
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+.tab-bar {
+  display: flex;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 4px;
+  border: 1px solid var(--border);
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.tab-btn {
+  flex: 1;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.tab-btn.active {
+  color: #000;
+  background: var(--accent-gradient);
+  box-shadow: 0 2px 16px rgba(245, 158, 11, 0.3);
+}
+.tab-btn:not(.active):hover {
+  color: var(--text);
+  background: rgba(245, 158, 11, 0.08);
+}
+.tab-icon {
+  font-size: 1.1rem;
+}
+
+.tab-content {
+  display: none;
+  animation: scaleIn 0.4s ease;
+}
+.tab-content.active { display: block; }
+
+/* === CARDS === */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.card-icon.orange { background: rgba(249, 115, 22, 0.15); }
+.card-icon.blue { background: rgba(96, 165, 250, 0.15); }
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.card-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* === FORM ELEMENTS === */
+.input-group {
+  margin-bottom: 20px;
+}
+.input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.input-field {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s;
+  outline: none;
+}
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.input-field::placeholder {
+  color: var(--text-dim);
+}
+textarea.input-field {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+.input-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+.select-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .select-row { grid-template-columns: 1fr; }
+}
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8a48a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--accent-gradient);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-primary .spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+.btn-primary.loading .spinner { display: block; }
+.btn-primary.loading .btn-text { opacity: 0.4; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === RESULTS === */
+.results-area {
+  margin-top: 32px;
+  display: none;
+}
+.results-area.visible {
+  display: block;
+  animation: fadeInUp 0.5s ease;
+}
+
+/* Gauge */
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+.gauge-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+.gauge-svg {
+  width: 180px;
+  height: 180px;
+  transform: rotate(-90deg);
+}
+.gauge-bg {
+  fill: none;
+  stroke: var(--bg-surface);
+  stroke-width: 10;
+}
+.gauge-fill {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s ease, stroke 0.5s ease;
+}
+.gauge-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.gauge-score {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.gauge-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+.gauge-rating {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 12px;
+  padding: 4px 16px;
+  border-radius: 100px;
+}
+
+/* Factor bars */
+.factors-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.factor-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.factor-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.factor-info { flex: 1; min-width: 0; }
+.factor-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.factor-detail {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+.factor-bar-wrap {
+  flex: 1;
+  max-width: 120px;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.factor-bar {
+  height: 100%;
+  border-radius: 3px;
+  animation: barFill 0.8s ease;
+}
+.factor-score {
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Suggestions */
+.suggestions-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.suggestions-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.suggestion-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.suggestion-item:last-child { border-bottom: none; }
+.suggestion-bullet {
+  width: 22px; height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-light);
+  margin-top: 1px;
+}
+
+/* Improved versions */
+.improved-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 12px;
+}
+.improved-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Subject line result items */
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.subject-item:hover {
+  border-color: var(--border-active);
+  background: var(--bg-card-alt);
+}
+.subject-rank {
+  width: 28px; height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-light);
+}
+.subject-text {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.4;
+  min-width: 0;
+  word-break: break-word;
+}
+.subject-score-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.copy-btn {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: var(--accent-light);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+.copy-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+.copy-btn.copied {
+  background: var(--green);
+  color: #000;
+  border-color: var(--green);
+  animation: copyFlash 0.4s ease;
+}
+
+/* Score badge colors */
+.score-high { background: var(--green-bg); color: var(--green-text); }
+.score-mid { background: var(--yellow-bg); color: var(--yellow); }
+.score-low { background: var(--red-bg); color: var(--red-text); }
+
+/* Spam flags */
+.spam-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.spam-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--red-bg);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--red-text);
+}
+
+/* === USAGE COUNTER === */
+.usage-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 24px;
+  font-size: 0.82rem;
+}
+.usage-text { color: var(--text-dim); }
+.usage-text strong { color: var(--text-muted); }
+.usage-upgrade {
+  color: var(--accent-light);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.usage-upgrade:hover { color: var(--accent); }
+
+/* === PRICING === */
+.pricing-section {
+  padding: 64px 0;
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+.section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.section-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+@media (max-width: 640px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+}
+.pricing-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  transition: all 0.3s;
+}
+.pricing-card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
+}
+.pricing-card.featured {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+.pricing-popular {
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-gradient);
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.pricing-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.pricing-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.pricing-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.pricing-currency {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.pricing-price {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.pricing-period {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.pricing-features {
+  list-style: none;
+  margin-bottom: 24px;
+}
+.pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.pricing-features li::before {
+  content: '';
+  width: 18px; height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.15);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2334d399' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: none;
+  font-family: inherit;
+}
+.pricing-btn-free {
+  background: var(--bg-surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.pricing-btn-free:hover { border-color: var(--border-active); background: var(--bg-card-alt); }
+.pricing-btn-pro {
+  background: var(--accent-gradient);
+  color: #000;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+}
+.pricing-btn-pro:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(245, 158, 11, 0.4); }
+
+/* === FOOTER === */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+footer a:hover { color: var(--accent-light); }
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .hero { padding: 48px 0 32px; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero-stats { gap: 24px; }
+  .card { padding: 24px; }
+  .factor-row { flex-wrap: wrap; gap: 8px; }
+  .factor-bar-wrap { max-width: none; }
+  .subject-item { flex-wrap: wrap; gap: 8px; }
+  .subject-score-badge { font-size: 0.7rem; }
+  .gauge-wrap { width: 150px; height: 150px; }
+  .gauge-svg { width: 150px; height: 150px; }
+  .gauge-score { font-size: 2.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">
+      <div class="logo-icon">&#9993;</div>
+      SubjectLine <span>Pro</span>
+    </a>
+    <div class="nav-links">
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="mailto:hello@miralabs.agency?subject=SubjectLine Pro — Upgrade to Pro" class="nav-cta">Get Pro</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      AI-Powered Email Intelligence
+    </div>
+    <h1>Write subject lines that<br><span class="gradient-text">actually get opened</span></h1>
+    <p>AI-powered analysis scores your subject lines on 6 key factors and generates high-converting alternatives. Stop guessing, start knowing.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">47%</div>
+        <div class="hero-stat-label">open on subject alone</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">69%</div>
+        <div class="hero-stat-label">report spam by subject</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">6-10</div>
+        <div class="hero-stat-label">ideal word count</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TABS SECTION -->
+<section class="tabs-section">
+  <div class="container">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="analyze" onclick="switchTab('analyze')">
+        <span class="tab-icon">&#128269;</span> Analyze
+      </button>
+      <button class="tab-btn" data-tab="generate" onclick="switchTab('generate')">
+        <span class="tab-icon">&#9889;</span> Generate
+      </button>
+    </div>
+
+    <!-- ANALYZE TAB -->
+    <div id="tab-analyze" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon orange">&#128269;</div>
+          <div>
+            <div class="card-title">Analyze Your Subject Line</div>
+            <div class="card-subtitle">Get a detailed score with actionable improvements</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Your Email Subject Line</label>
+          <input type="text" id="analyze-input" class="input-field" placeholder="e.g. Don't miss our exclusive Black Friday deals!" maxlength="200" autocomplete="off">
+          <div class="input-hint" id="char-count">0 characters &middot; 0 words</div>
+        </div>
+        <button class="btn-primary" id="analyze-btn" onclick="analyzeSubject()">
+          <span class="spinner"></span>
+          <span class="btn-text">Analyze Subject Line</span>
+        </button>
+
+        <div id="analyze-results" class="results-area">
+          <!-- Gauge -->
+          <div class="gauge-container">
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 100 100">
+                <circle class="gauge-bg" cx="50" cy="50" r="45"/>
+                <circle class="gauge-fill" id="gauge-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"/>
+              </svg>
+              <div class="gauge-center">
+                <div class="gauge-score" id="gauge-score">0</div>
+                <div class="gauge-label">Overall</div>
+              </div>
+            </div>
+            <div class="gauge-rating" id="gauge-rating">-</div>
+          </div>
+
+          <!-- Factor breakdown -->
+          <div class="factors-grid" id="factors-grid"></div>
+
+          <!-- Spam flags -->
+          <div id="spam-section" style="display:none; margin-bottom: 20px;">
+            <div class="suggestions-card" style="border-color: rgba(248, 113, 113, 0.2);">
+              <div class="suggestions-title" style="color: var(--red-text);">&#9888; Spam Triggers Detected</div>
+              <div class="spam-flags" id="spam-flags"></div>
+            </div>
+          </div>
+
+          <!-- Suggestions -->
+          <div class="suggestions-card">
+            <div class="suggestions-title">&#128161; Improvement Suggestions</div>
+            <div id="suggestions-list"></div>
+          </div>
+
+          <!-- Improved versions -->
+          <div class="improved-card">
+            <div class="improved-title">&#10024; Improved Versions</div>
+            <div id="improved-list"></div>
+          </div>
+        </div>
+
+        <div class="usage-bar">
+          <span class="usage-text"><strong id="usage-count-analyze">0</strong> / 5 free analyses this month</span>
+          <a href="#pricing" class="usage-upgrade">Upgrade to Pro &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATE TAB -->
+    <div id="tab-generate" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">&#9889;</div>
+          <div>
+            <div class="card-title">Generate Subject Lines</div>
+            <div class="card-subtitle">Get 10 high-converting options tailored to your email</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">What's the email about?</label>
+          <textarea id="gen-topic" class="input-field" placeholder="e.g. We're launching a new project management tool with AI features. Targeting startup founders. Want them to sign up for early access."></textarea>
+        </div>
+        <div class="select-row">
+          <div class="input-group">
+            <label class="input-label">Tone</label>
+            <select id="gen-tone" class="input-field">
+              <option value="professional">Professional</option>
+              <option value="casual">Casual</option>
+              <option value="urgent">Urgent</option>
+              <option value="curious">Curious</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Goal</label>
+            <select id="gen-goal" class="input-field">
+              <option value="open">Maximize Open Rate</option>
+              <option value="click">Maximize Click Rate</option>
+              <option value="reply">Maximize Reply Rate</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" id="gen-btn" onclick="generateSubjects()">
+          <span class="spinner"></span>
+          <span class="btn-text">Generate 10 Subject Lines</span>
+        </button>
+
+        <div id="generate-results" class="results-area">
+          <div id="generated-list"></div>
+        </div>
+
+        <div class="usage-bar">
+          <span class="usage-text"><strong id="usage-count-gen">0</strong> / 5 free generations this month</span>
+          <a href="#pricing" class="usage-upgrade">Upgrade to Pro &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="container">
+    <div class="section-title">Simple, transparent pricing</div>
+    <div class="section-subtitle">Start free. Upgrade when you're ready to scale.</div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Free</div>
+        <div class="pricing-desc">Perfect for getting started</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">$</span>
+          <span class="pricing-price">0</span>
+          <span class="pricing-period">/month</span>
+        </div>
+        <ul class="pricing-features">
+          <li>5 subject line analyses per month</li>
+          <li>5 subject line generations per month</li>
+          <li>Score breakdown on 6 factors</li>
+          <li>3 improvement suggestions</li>
+          <li>3 improved alternatives</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-free" onclick="switchTab('analyze'); window.scrollTo({top: 0, behavior: 'smooth'});">Start Free</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-popular">Most Popular</div>
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-desc">For marketers and teams</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">$</span>
+          <span class="pricing-price">4.99</span>
+          <span class="pricing-period">/month</span>
+        </div>
+        <ul class="pricing-features">
+          <li>Unlimited analyses</li>
+          <li>Unlimited generations</li>
+          <li>Advanced spam detection</li>
+          <li>A/B test recommendations</li>
+          <li>Priority email support</li>
+          <li>Export results as CSV</li>
+        </ul>
+        <a href="mailto:hello@miralabs.agency?subject=SubjectLine Pro — Upgrade to Pro&body=Hi, I'd like to upgrade to SubjectLine Pro ($4.99/mo). Please send me the payment link." class="pricing-btn pricing-btn-pro">Upgrade to Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom: 6px;">SubjectLine Pro &mdash; Built by <a href="/">MiraLabs</a></p>
+    <p>Email open rates matter. Write better subject lines. &middot; <a href="mailto:hello@miralabs.agency">Contact</a></p>
+  </div>
+</footer>
+
+<script>
+// ===== DICTIONARIES =====
+const POWER_WORDS = [
+  'free','exclusive','limited','proven','secret','guaranteed','instant','new','save','discover',
+  'unlock','revealed','breakthrough','ultimate','essential','powerful','remarkable','incredible',
+  'amazing','stunning','urgent','critical','important','warning','alert','deadline','expires',
+  'hurry','last chance','final','bonus','premium','elite','insider','confidential','private',
+  'special','rare','unique','revolutionary','transform','boost','skyrocket','double','triple',
+  'massive','explosive','jaw-dropping','life-changing','game-changing','must-see','shocking',
+  'surprising','unexpected','unbelievable','extraordinary','epic','legendary'
+];
+
+const SPAM_WORDS = [
+  'buy now','act now','click here','subscribe now','order now','sign up free','winner','congratulations',
+  'million','billion','earn money','make money','cash','credit','no obligation','risk-free',
+  'guarantee','100%','!!','$$$','lowest price','best price','bargain','cheap','discount',
+  'double your','increase your','opt in','remove','unsubscribe','click below','apply now',
+  'dear friend','no cost','obligation','as seen on','be your own boss','work from home',
+  'extra income','fast cash','financial freedom'
+];
+
+const CURIOSITY_WORDS = [
+  'why','how','what','secret','truth','behind','hidden','unexpected','surprising','strange',
+  'weird','little-known','mistake','myth','actually','really','finally'
+];
+
+const BENEFIT_WORDS = [
+  'save','grow','boost','increase','improve','maximize','optimize','achieve','master','dominate',
+  'accelerate','simplify','automate','streamline','reduce','eliminate','solve','fix','avoid','prevent'
+];
+
+// ===== SCORING ENGINE =====
+function analyzeSubjectLine(subject) {
+  const trimmed = subject.trim();
+  if (!trimmed) return null;
+
+  const words = trimmed.split(/\s+/);
+  const wordCount = words.length;
+  const charCount = trimmed.length;
+  const lowerSubject = trimmed.toLowerCase();
+  const lowerWords = words.map(w => w.toLowerCase().replace(/[^a-z0-9'-]/g, ''));
+
+  // 1. Length score (max 20)
+  let lengthScore = 0;
+  let lengthDetail = '';
+  if (wordCount >= 6 && wordCount <= 10) {
+    lengthScore = 20;
+    lengthDetail = `${wordCount} words — perfect range`;
+  } else if (wordCount >= 4 && wordCount <= 12) {
+    lengthScore = 14;
+    lengthDetail = `${wordCount} words — good, but ${wordCount < 6 ? 'a bit short' : 'slightly long'}`;
+  } else if (wordCount >= 2 && wordCount <= 15) {
+    lengthScore = 8;
+    lengthDetail = `${wordCount} words — ${wordCount < 4 ? 'too short for context' : 'too long, may get truncated'}`;
+  } else {
+    lengthScore = 3;
+    lengthDetail = `${wordCount} words — ${wordCount < 2 ? 'way too short' : 'way too long, will be cut off'}`;
+  }
+
+  // Char count adjustment
+  if (charCount >= 40 && charCount <= 60) {
+    lengthScore = Math.min(20, lengthScore + 3);
+    lengthDetail += ` (${charCount} chars, ideal)`;
+  } else if (charCount > 60 && charCount <= 80) {
+    lengthDetail += ` (${charCount} chars, may truncate on mobile)`;
+  } else if (charCount > 80) {
+    lengthScore = Math.max(2, lengthScore - 4);
+    lengthDetail += ` (${charCount} chars, will truncate)`;
+  } else {
+    lengthDetail += ` (${charCount} chars)`;
+  }
+
+  // 2. Power words score (max 20)
+  const foundPower = [];
+  POWER_WORDS.forEach(pw => {
+    if (lowerSubject.includes(pw)) foundPower.push(pw);
+  });
+  let powerScore = Math.min(20, foundPower.length * 7);
+  if (foundPower.length === 0) powerScore = 2;
+  const powerDetail = foundPower.length > 0
+    ? `Found: ${foundPower.slice(0, 4).join(', ')}${foundPower.length > 4 ? '...' : ''}`
+    : 'No power words detected';
+
+  // 3. Personalization score (max 15)
+  let persScore = 0;
+  let persDetail = '';
+  const persMarkers = [];
+  if (/\{\{.*?\}\}/.test(trimmed)) { persScore += 10; persMarkers.push('merge tag'); }
+  if (/\byou\b/i.test(trimmed)) { persScore += 5; persMarkers.push('"you"'); }
+  if (/\byour\b/i.test(trimmed)) { persScore += 5; persMarkers.push('"your"'); }
+  if (/\bname\b/i.test(trimmed)) { persScore += 3; persMarkers.push('"name"'); }
+  persScore = Math.min(15, persScore);
+  persDetail = persMarkers.length > 0
+    ? `Detected: ${persMarkers.join(', ')}`
+    : 'No personalization detected — add "you" or merge tags';
+
+  // 4. Spam check (max 15 — higher = fewer spam triggers)
+  const foundSpam = [];
+  SPAM_WORDS.forEach(sw => {
+    if (lowerSubject.includes(sw)) foundSpam.push(sw);
+  });
+  const allCaps = trimmed === trimmed.toUpperCase() && trimmed.length > 3;
+  const excessivePunctuation = (trimmed.match(/[!?]{2,}/g) || []).length > 0;
+  let spamPenalty = foundSpam.length * 5 + (allCaps ? 8 : 0) + (excessivePunctuation ? 4 : 0);
+  let spamScore = Math.max(0, 15 - spamPenalty);
+  let spamDetail = '';
+  if (foundSpam.length === 0 && !allCaps && !excessivePunctuation) {
+    spamDetail = 'Clean — no spam triggers';
+  } else {
+    const issues = [];
+    if (foundSpam.length > 0) issues.push(`${foundSpam.length} spam word(s)`);
+    if (allCaps) issues.push('ALL CAPS');
+    if (excessivePunctuation) issues.push('excessive punctuation');
+    spamDetail = issues.join(', ');
+  }
+
+  // 5. Emoji usage (max 10)
+  const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{200D}\u{20E3}]/gu;
+  const emojis = trimmed.match(emojiRegex) || [];
+  let emojiScore = 0;
+  let emojiDetail = '';
+  if (emojis.length === 1) {
+    emojiScore = 10;
+    emojiDetail = '1 emoji — great for standing out in inbox';
+  } else if (emojis.length === 2) {
+    emojiScore = 7;
+    emojiDetail = '2 emojis — acceptable, but 1 is ideal';
+  } else if (emojis.length > 2) {
+    emojiScore = 3;
+    emojiDetail = `${emojis.length} emojis — too many, reduces professionalism`;
+  } else {
+    emojiScore = 5;
+    emojiDetail = 'No emoji — consider adding 1 for +56% open rate lift';
+  }
+
+  // 6. Structure score (max 20)
+  let structScore = 5;
+  let structDetail = '';
+  const structNotes = [];
+  const isQuestion = /\?/.test(trimmed);
+  const hasNumber = /\d/.test(trimmed);
+  const isHowTo = /^how\s+(to|i|we|you)/i.test(trimmed);
+  const hasBrackets = /[\[\(]/.test(trimmed);
+  const startsWithNumber = /^\d/.test(trimmed);
+  const hasCuriosity = CURIOSITY_WORDS.some(w => lowerSubject.includes(w));
+  const hasBenefit = BENEFIT_WORDS.some(w => lowerSubject.includes(w));
+  const hasColon = /:/.test(trimmed);
+
+  if (isQuestion) { structScore += 10; structNotes.push('question format (+10)'); }
+  if (hasNumber) { structScore += 5; structNotes.push('contains number (+5)'); }
+  if (isHowTo) { structScore += 8; structNotes.push('how-to format (+8)'); }
+  if (hasBrackets) { structScore += 3; structNotes.push('brackets for context (+3)'); }
+  if (startsWithNumber) { structScore += 3; structNotes.push('leads with number (+3)'); }
+  if (hasCuriosity) { structScore += 4; structNotes.push('curiosity trigger (+4)'); }
+  if (hasBenefit) { structScore += 4; structNotes.push('benefit-oriented (+4)'); }
+  if (hasColon) { structScore += 2; structNotes.push('colon structure (+2)'); }
+
+  structScore = Math.min(20, structScore);
+  structDetail = structNotes.length > 0 ? structNotes.join(', ') : 'Plain statement — try a question or add numbers';
+
+  // Total
+  const totalScore = Math.min(100, lengthScore + powerScore + persScore + spamScore + emojiScore + structScore);
+
+  // Rating
+  let rating, ratingColor, ratingBg;
+  if (totalScore >= 80) { rating = 'Excellent'; ratingColor = '#34d399'; ratingBg = 'rgba(52,211,153,0.15)'; }
+  else if (totalScore >= 60) { rating = 'Good'; ratingColor = '#fbbf24'; ratingBg = 'rgba(251,191,36,0.15)'; }
+  else if (totalScore >= 40) { rating = 'Needs Work'; ratingColor = '#f97316'; ratingBg = 'rgba(249,115,22,0.15)'; }
+  else { rating = 'Poor'; ratingColor = '#f87171'; ratingBg = 'rgba(248,113,113,0.15)'; }
+
+  // Suggestions
+  const suggestions = generateSuggestions(subject, {
+    wordCount, charCount, foundPower, foundSpam, persMarkers, emojis,
+    isQuestion, hasNumber, isHowTo, allCaps, excessivePunctuation, hasCuriosity, hasBenefit
+  });
+
+  // Improved versions
+  const improved = generateImproved(subject, {
+    wordCount, charCount, foundPower, foundSpam, persMarkers, emojis,
+    isQuestion, hasNumber, isHowTo, allCaps, hasCuriosity, hasBenefit
+  });
+
+  return {
+    totalScore, rating, ratingColor, ratingBg,
+    factors: [
+      { name: 'Length', icon: '&#128207;', score: lengthScore, max: 20, detail: lengthDetail, color: scoreColor(lengthScore, 20) },
+      { name: 'Power Words', icon: '&#9889;', score: powerScore, max: 20, detail: powerDetail, color: scoreColor(powerScore, 20) },
+      { name: 'Personalization', icon: '&#128100;', score: persScore, max: 15, detail: persDetail, color: scoreColor(persScore, 15) },
+      { name: 'Spam Safety', icon: '&#128737;', score: spamScore, max: 15, detail: spamDetail, color: scoreColor(spamScore, 15) },
+      { name: 'Emoji Usage', icon: '&#128522;', score: emojiScore, max: 10, detail: emojiDetail, color: scoreColor(emojiScore, 10) },
+      { name: 'Structure', icon: '&#128736;', score: structScore, max: 20, detail: structDetail, color: scoreColor(structScore, 20) }
+    ],
+    foundSpam, allCaps, excessivePunctuation,
+    suggestions, improved
+  };
+}
+
+function scoreColor(score, max) {
+  const pct = score / max;
+  if (pct >= 0.7) return 'var(--green)';
+  if (pct >= 0.45) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function gaugeColor(score) {
+  if (score >= 80) return '#34d399';
+  if (score >= 60) return '#fbbf24';
+  if (score >= 40) return '#f97316';
+  return '#f87171';
+}
+
+// ===== SUGGESTION ENGINE =====
+function generateSuggestions(subject, data) {
+  const s = [];
+
+  if (data.wordCount < 6) {
+    s.push('Add more context — subject lines with 6-10 words get the highest open rates. Try expanding with a benefit or specific detail.');
+  }
+  if (data.wordCount > 10) {
+    s.push('Shorten your subject line — it may get truncated on mobile. Aim for 6-10 words (40-60 characters). Cut filler words like "just", "really", or "very".');
+  }
+  if (data.charCount > 60) {
+    s.push(`At ${data.charCount} characters, this will be cut off on mobile (shows ~40 chars). Front-load the most compelling words so the hook appears first.`);
+  }
+  if (data.foundPower.length === 0) {
+    s.push('Add a power word to create urgency or curiosity. Try words like "exclusive", "proven", "secret", "free", "instant", or "limited" to boost emotional response.');
+  }
+  if (data.persMarkers.length === 0) {
+    s.push('Personalize with "you", "your", or merge tags like {{first_name}}. Personalized subject lines are 26% more likely to be opened.');
+  }
+  if (data.foundSpam.length > 0) {
+    s.push(`Remove spam trigger words (${data.foundSpam.slice(0, 3).join(', ')}). These can land your email in the junk folder. Rephrase with softer alternatives.`);
+  }
+  if (data.allCaps) {
+    s.push('Avoid ALL CAPS — it triggers spam filters and feels aggressive. Use Title Case or Sentence case instead for a professional look.');
+  }
+  if (data.excessivePunctuation) {
+    s.push('Reduce excessive punctuation (!! or ??). One exclamation mark max. Multiple marks trigger spam filters and reduce credibility.');
+  }
+  if (!data.isQuestion && !data.hasNumber && !data.isHowTo) {
+    s.push('Try rephrasing as a question or adding a specific number. "5 ways to..." and "Are you making this mistake?" consistently outperform plain statements.');
+  }
+  if (data.emojis.length === 0) {
+    s.push('Consider adding one emoji at the start or end. A single relevant emoji can increase open rates by up to 56% by standing out in the inbox.');
+  }
+  if (data.emojis.length > 2) {
+    s.push('Too many emojis reduce professionalism and trigger spam filters. Use just 1 emoji for maximum impact without looking spammy.');
+  }
+  if (!data.hasCuriosity && !data.isQuestion) {
+    s.push('Create curiosity with words like "why", "secret", "truth", "hidden", or "surprising". Curiosity gaps drive opens because readers want to close the loop.');
+  }
+  if (!data.hasBenefit) {
+    s.push('Lead with a clear benefit. What does the reader gain? Words like "save", "boost", "grow", or "master" signal concrete value.');
+  }
+
+  return s.slice(0, 3);
+}
+
+// ===== IMPROVED VERSION ENGINE =====
+function generateImproved(subject, data) {
+  const trimmed = subject.trim();
+  const words = trimmed.split(/\s+/);
+  const improved = [];
+
+  // Strategy 1: Add power word + question
+  const pw = ['exclusive','proven','surprising','essential','critical'];
+  const randPw = pw[Math.floor(Math.random() * pw.length)];
+  if (!data.isQuestion) {
+    improved.push(`${randPw.charAt(0).toUpperCase() + randPw.slice(1)}: ${trimmed.replace(/[.!]+$/, '')}?`);
+  } else {
+    improved.push(`${randPw.charAt(0).toUpperCase() + randPw.slice(1)}: ${trimmed}`);
+  }
+
+  // Strategy 2: Number + benefit reframe
+  const nums = ['5','7','3','10'];
+  const randNum = nums[Math.floor(Math.random() * nums.length)];
+  const core = trimmed.replace(/^(re:|fw:|fwd:)\s*/i, '').replace(/[.!?]+$/, '').toLowerCase();
+  improved.push(`${randNum} ${data.isQuestion ? 'answers' : 'reasons'} why ${core} matters for your business`);
+
+  // Strategy 3: Curiosity + personalization
+  const curiosity = ['The truth about','What nobody tells you about','The hidden secret behind','Why most people get wrong:'];
+  const randCuriosity = curiosity[Math.floor(Math.random() * curiosity.length)];
+  const shortCore = words.slice(0, Math.min(5, words.length)).join(' ').replace(/[.!?]+$/, '').toLowerCase();
+  improved.push(`${randCuriosity} ${shortCore}`);
+
+  return improved;
+}
+
+// ===== GENERATION ENGINE =====
+const FORMULAS = {
+  professional: {
+    open: [
+      (t) => `Quick question about ${t.topic}`,
+      (t) => `${t.topic}: What the data actually shows`,
+      (t) => `A smarter approach to ${t.topic}`,
+      (t) => `[Update] New insights on ${t.topic}`,
+      (t) => `The ${t.topic} framework top teams are using`,
+      (t) => `Rethinking ${t.topic} — here's what changed`,
+      (t) => `${randNum()} proven strategies for ${t.topic}`,
+      (t) => `Why your ${t.topic} approach needs an update`,
+      (t) => `${t.topic}: A better way forward`,
+      (t) => `Important: Your guide to ${t.topic} in ${new Date().getFullYear()}`
+    ],
+    click: [
+      (t) => `See how ${t.audience || 'teams'} are solving ${t.topic}`,
+      (t) => `[Free resource] The complete ${t.topic} playbook`,
+      (t) => `${t.topic} benchmarks: Where do you stand?`,
+      (t) => `The ${t.topic} checklist you've been missing`,
+      (t) => `Inside look: Our ${t.topic} results`,
+      (t) => `${randNum()} ${t.topic} examples worth studying`,
+      (t) => `Your personalized ${t.topic} report is ready`,
+      (t) => `Compare your ${t.topic} performance`,
+      (t) => `[Case study] How we improved ${t.topic} by ${randPct()}%`,
+      (t) => `${t.topic} toolkit: Everything in one place`
+    ],
+    reply: [
+      (t) => `Quick thought on your ${t.topic}`,
+      (t) => `Can I share something about ${t.topic}?`,
+      (t) => `${t.topic} — would love your take`,
+      (t) => `Noticed something about your ${t.topic}`,
+      (t) => `Question about your ${t.topic} goals`,
+      (t) => `Would this ${t.topic} approach work for you?`,
+      (t) => `${t.topic}: Am I off base here?`,
+      (t) => `Curious about your experience with ${t.topic}`,
+      (t) => `Two options for your ${t.topic} — which fits better?`,
+      (t) => `A suggestion for your ${t.topic} strategy`
+    ]
+  },
+  casual: {
+    open: [
+      (t) => `You won't believe what happened with ${t.topic}`,
+      (t) => `So... about ${t.topic}`,
+      (t) => `This ${t.topic} hack is a game-changer`,
+      (t) => `${t.topic}? There's a better way`,
+      (t) => `Real talk about ${t.topic}`,
+      (t) => `${t.topic} just got way easier`,
+      (t) => `The ${t.topic} trick nobody's talking about`,
+      (t) => `Stop overcomplicating ${t.topic}`,
+      (t) => `${t.topic} tip that took me ${randNum()} years to learn`,
+      (t) => `Why I changed my mind about ${t.topic}`
+    ],
+    click: [
+      (t) => `I made a thing for ${t.topic}`,
+      (t) => `${randNum()} ${t.topic} ideas (steal these)`,
+      (t) => `Your ${t.topic} starter pack`,
+      (t) => `Bookmarked: The best ${t.topic} resources`,
+      (t) => `This ${t.topic} template saves hours`,
+      (t) => `The ${t.topic} swipe file you need`,
+      (t) => `Before vs after: My ${t.topic} transformation`,
+      (t) => `Grab this ${t.topic} cheat sheet`,
+      (t) => `${t.topic} in ${randNum()} minutes flat`,
+      (t) => `Everything I know about ${t.topic} (so far)`
+    ],
+    reply: [
+      (t) => `Hey, quick ${t.topic} question`,
+      (t) => `What's your take on ${t.topic}?`,
+      (t) => `${t.topic} — am I doing this right?`,
+      (t) => `Need your help with ${t.topic}`,
+      (t) => `${t.topic}: Yay or nay?`,
+      (t) => `Can we chat about ${t.topic}?`,
+      (t) => `${t.topic} — thought of you`,
+      (t) => `This or that? (${t.topic} edition)`,
+      (t) => `Hot take on ${t.topic} — agree?`,
+      (t) => `Your ${t.topic} opinion matters`
+    ]
+  },
+  urgent: {
+    open: [
+      (t) => `[Time-sensitive] ${t.topic} deadline approaching`,
+      (t) => `Last chance: ${t.topic} ends tonight`,
+      (t) => `${t.topic} — only ${randNum()} spots left`,
+      (t) => `Warning: Your ${t.topic} is at risk`,
+      (t) => `Don't miss this ${t.topic} opportunity`,
+      (t) => `${randNum()} hours left for ${t.topic}`,
+      (t) => `Final reminder: ${t.topic}`,
+      (t) => `Act now: ${t.topic} won't wait`,
+      (t) => `Your ${t.topic} window is closing`,
+      (t) => `Important ${t.topic} update — action needed`
+    ],
+    click: [
+      (t) => `[Expires today] Your ${t.topic} access`,
+      (t) => `${t.topic}: Claim before midnight`,
+      (t) => `Limited: ${t.topic} early access`,
+      (t) => `${t.topic} — first come, first served`,
+      (t) => `Flash deal: ${t.topic} (${randNum()} hours only)`,
+      (t) => `Your reserved ${t.topic} spot expires soon`,
+      (t) => `Priority access to ${t.topic} — ending`,
+      (t) => `${t.topic}: Get in before the waitlist`,
+      (t) => `Only ${randNum()} left: ${t.topic}`,
+      (t) => `Your ${t.topic} coupon expires at midnight`
+    ],
+    reply: [
+      (t) => `Urgent: Need your decision on ${t.topic}`,
+      (t) => `${t.topic} — can you reply today?`,
+      (t) => `Time-sensitive ${t.topic} question`,
+      (t) => `${t.topic}: I need your answer by EOD`,
+      (t) => `Quick — ${t.topic} decision needed`,
+      (t) => `Before I finalize ${t.topic}...`,
+      (t) => `${t.topic}: Last chance to weigh in`,
+      (t) => `Holding ${t.topic} for your response`,
+      (t) => `${t.topic} — going live unless I hear from you`,
+      (t) => `Deadline today: Your input on ${t.topic}`
+    ]
+  },
+  curious: {
+    open: [
+      (t) => `What if ${t.topic} could be ${randPct()}% easier?`,
+      (t) => `The surprising truth about ${t.topic}`,
+      (t) => `Why does nobody talk about ${t.topic} this way?`,
+      (t) => `${t.topic}: What we got wrong all along`,
+      (t) => `The hidden connection between ${t.topic} and success`,
+      (t) => `${randNum()} myths about ${t.topic} (debunked)`,
+      (t) => `Is ${t.topic} actually broken?`,
+      (t) => `What I discovered after ${randNum()} weeks of ${t.topic}`,
+      (t) => `${t.topic}: The question nobody's asking`,
+      (t) => `The one thing about ${t.topic} that shocked me`
+    ],
+    click: [
+      (t) => `The ${t.topic} experiment that changed everything`,
+      (t) => `[Thread] What ${randNum()} hours of ${t.topic} research revealed`,
+      (t) => `I analyzed ${randBigNum()} ${t.topic} examples. Here's what I found`,
+      (t) => `${t.topic}: The data tells a different story`,
+      (t) => `What happens when you rethink ${t.topic}?`,
+      (t) => `The ${t.topic} paradox nobody sees coming`,
+      (t) => `Behind the scenes: How ${t.topic} really works`,
+      (t) => `${t.topic} decoded: What the best do differently`,
+      (t) => `The counterintuitive approach to ${t.topic}`,
+      (t) => `${t.topic}: See the results for yourself`
+    ],
+    reply: [
+      (t) => `Am I wrong about ${t.topic}?`,
+      (t) => `${t.topic} — does this surprise you too?`,
+      (t) => `What would you do about ${t.topic}?`,
+      (t) => `${t.topic}: I have a theory`,
+      (t) => `Have you noticed this about ${t.topic}?`,
+      (t) => `${t.topic} puzzle — can you solve it?`,
+      (t) => `Why do you think ${t.topic} works this way?`,
+      (t) => `${t.topic}: Something doesn't add up`,
+      (t) => `I'm torn on ${t.topic} — help me decide?`,
+      (t) => `What's the biggest misconception about ${t.topic}?`
+    ]
+  }
+};
+
+function randNum() { return [3,5,7,10,12,15][Math.floor(Math.random() * 6)]; }
+function randPct() { return [37,42,56,63,78,83][Math.floor(Math.random() * 6)]; }
+function randBigNum() { return ['100','500','1,000','2,500','5,000'][Math.floor(Math.random() * 5)]; }
+
+function extractTopic(text) {
+  // Simplify the user's description into a usable topic phrase
+  const cleaned = text.trim()
+    .replace(/[.!?,;:]+$/g, '')
+    .replace(/^(i want to|we want to|we're|i'm|we are|i am|please|help me|need to|trying to)\s+/i, '')
+    .replace(/^(write|create|send|draft|compose)\s+(an?\s+)?(email|message|newsletter|campaign)\s+(about|regarding|for|on)\s+/i, '')
+    .replace(/^(about|regarding|for|on)\s+/i, '');
+
+  // Extract a short meaningful topic (max 6 words)
+  const words = cleaned.split(/\s+/);
+  let topic = words.slice(0, Math.min(6, words.length)).join(' ').toLowerCase();
+
+  // Check for audience mentions
+  let audience = null;
+  const audiencePatterns = [
+    /(?:targeting|for|aimed at|reaching)\s+(.+?)(?:\.|,|$)/i,
+    /(?:our|the)\s+(customers|users|subscribers|members|audience|clients|readers|followers)/i
+  ];
+  for (const p of audiencePatterns) {
+    const m = text.match(p);
+    if (m) { audience = m[1].trim().toLowerCase().split(/\s+/).slice(0, 3).join(' '); break; }
+  }
+
+  return { topic, audience };
+}
+
+function generateSubjectLines(description, tone, goal) {
+  const { topic, audience } = extractTopic(description);
+  const formulas = FORMULAS[tone][goal];
+
+  // Shuffle and pick 10
+  const shuffled = [...formulas].sort(() => Math.random() - 0.5);
+  const results = shuffled.slice(0, 10).map(fn => {
+    const line = fn({ topic, audience });
+    // Score each generated line
+    const analysis = analyzeSubjectLine(line);
+    return {
+      text: line.charAt(0).toUpperCase() + line.slice(1),
+      score: analysis ? analysis.totalScore : 50
+    };
+  });
+
+  // Sort by score descending
+  results.sort((a, b) => b.score - a.score);
+  return results;
+}
+
+// ===== USAGE TRACKING =====
+function getUsage() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('slp_usage') || '{}');
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
+    if (stored.month !== monthKey) {
+      return { month: monthKey, analyze: 0, generate: 0 };
+    }
+    return stored;
+  } catch { return { month: `${new Date().getFullYear()}-${new Date().getMonth()}`, analyze: 0, generate: 0 }; }
+}
+
+function saveUsage(usage) {
+  try { localStorage.setItem('slp_usage', JSON.stringify(usage)); } catch {}
+}
+
+function checkLimit(type) {
+  const usage = getUsage();
+  return (usage[type] || 0) < 5;
+}
+
+function incrementUsage(type) {
+  const usage = getUsage();
+  usage[type] = (usage[type] || 0) + 1;
+  saveUsage(usage);
+  updateUsageDisplay();
+}
+
+function updateUsageDisplay() {
+  const usage = getUsage();
+  const ac = document.getElementById('usage-count-analyze');
+  const gc = document.getElementById('usage-count-gen');
+  if (ac) ac.textContent = usage.analyze || 0;
+  if (gc) gc.textContent = usage.generate || 0;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ===== ANALYZE ACTION =====
+function analyzeSubject() {
+  const input = document.getElementById('analyze-input');
+  const subject = input.value.trim();
+  if (!subject) { input.focus(); return; }
+
+  if (!checkLimit('analyze')) {
+    alert('You\'ve used all 5 free analyses this month. Upgrade to Pro for unlimited access!');
+    return;
+  }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Simulate brief processing
+  setTimeout(() => {
+    const result = analyzeSubjectLine(subject);
+    if (!result) { btn.classList.remove('loading'); btn.disabled = false; return; }
+
+    incrementUsage('analyze');
+    renderAnalysisResults(result);
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    const resultsArea = document.getElementById('analyze-results');
+    resultsArea.classList.add('visible');
+    resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 800);
+}
+
+function renderAnalysisResults(result) {
+  // Gauge
+  const circle = document.getElementById('gauge-circle');
+  const circumference = 283;
+  const offset = circumference - (result.totalScore / 100) * circumference;
+  const color = gaugeColor(result.totalScore);
+
+  circle.style.stroke = color;
+  circle.style.strokeDashoffset = offset;
+
+  const scoreEl = document.getElementById('gauge-score');
+  scoreEl.style.color = color;
+  animateNumber(scoreEl, result.totalScore);
+
+  const ratingEl = document.getElementById('gauge-rating');
+  ratingEl.textContent = result.rating;
+  ratingEl.style.color = result.ratingColor;
+  ratingEl.style.background = result.ratingBg;
+
+  // Factors
+  const grid = document.getElementById('factors-grid');
+  grid.innerHTML = result.factors.map(f => `
+    <div class="factor-row">
+      <div class="factor-icon" style="background: ${f.color}22;">${f.icon}</div>
+      <div class="factor-info">
+        <div class="factor-name">${f.name}</div>
+        <div class="factor-detail">${f.detail}</div>
+      </div>
+      <div class="factor-bar-wrap">
+        <div class="factor-bar" style="width: ${(f.score/f.max)*100}%; background: ${f.color};"></div>
+      </div>
+      <div class="factor-score" style="color: ${f.color};">${f.score}/${f.max}</div>
+    </div>
+  `).join('');
+
+  // Spam flags
+  const spamSection = document.getElementById('spam-section');
+  const spamFlags = document.getElementById('spam-flags');
+  const allFlags = [...result.foundSpam];
+  if (result.allCaps) allFlags.push('ALL CAPS');
+  if (result.excessivePunctuation) allFlags.push('Excessive !! or ??');
+
+  if (allFlags.length > 0) {
+    spamSection.style.display = 'block';
+    spamFlags.innerHTML = allFlags.map(f => `<span class="spam-tag">&#9888; ${f}</span>`).join('');
+  } else {
+    spamSection.style.display = 'none';
+  }
+
+  // Suggestions
+  const sugList = document.getElementById('suggestions-list');
+  sugList.innerHTML = result.suggestions.map((s, i) => `
+    <div class="suggestion-item">
+      <div class="suggestion-bullet">${i + 1}</div>
+      <div>${s}</div>
+    </div>
+  `).join('');
+
+  // Improved versions
+  const impList = document.getElementById('improved-list');
+  impList.innerHTML = result.improved.map((text, i) => {
+    const score = analyzeSubjectLine(text);
+    const s = score ? score.totalScore : 50;
+    return `
+      <div class="subject-item">
+        <div class="subject-rank">${i + 1}</div>
+        <div class="subject-text">${escapeHtml(text)}</div>
+        <div class="subject-score-badge ${s >= 70 ? 'score-high' : s >= 45 ? 'score-mid' : 'score-low'}">${s}/100</div>
+        <button class="copy-btn" onclick="copyText(this, '${escapeJs(text)}')">Copy</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== GENERATE ACTION =====
+function generateSubjects() {
+  const topic = document.getElementById('gen-topic').value.trim();
+  if (!topic) { document.getElementById('gen-topic').focus(); return; }
+
+  if (!checkLimit('generate')) {
+    alert('You\'ve used all 5 free generations this month. Upgrade to Pro for unlimited access!');
+    return;
+  }
+
+  const tone = document.getElementById('gen-tone').value;
+  const goal = document.getElementById('gen-goal').value;
+
+  const btn = document.getElementById('gen-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const results = generateSubjectLines(topic, tone, goal);
+    incrementUsage('generate');
+    renderGeneratedResults(results);
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    const resultsArea = document.getElementById('generate-results');
+    resultsArea.classList.add('visible');
+    resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 1000);
+}
+
+function renderGeneratedResults(results) {
+  const list = document.getElementById('generated-list');
+  list.innerHTML = results.map((r, i) => `
+    <div class="subject-item" style="animation: fadeInUp ${0.3 + i * 0.06}s ease both;">
+      <div class="subject-rank">${i + 1}</div>
+      <div class="subject-text">${escapeHtml(r.text)}</div>
+      <div class="subject-score-badge ${r.score >= 70 ? 'score-high' : r.score >= 45 ? 'score-mid' : 'score-low'}">${r.score}/100</div>
+      <button class="copy-btn" onclick="copyText(this, '${escapeJs(r.text)}')">Copy</button>
+    </div>
+  `).join('');
+}
+
+// ===== UTILITIES =====
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeJs(str) {
+  return str.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+
+function animateNumber(el, target) {
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const interval = setInterval(() => {
+    current += step;
+    if (current >= target) { current = target; clearInterval(interval); }
+    el.textContent = current;
+  }, 25);
+}
+
+// ===== CHAR COUNTER =====
+document.getElementById('analyze-input').addEventListener('input', function() {
+  const val = this.value;
+  const chars = val.length;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  const counter = document.getElementById('char-count');
+  counter.textContent = `${chars} character${chars !== 1 ? 's' : ''} \u00B7 ${words} word${words !== 1 ? 's' : ''}`;
+
+  if (chars >= 40 && chars <= 60) {
+    counter.style.color = 'var(--green-text)';
+  } else if (chars > 60 && chars <= 80) {
+    counter.style.color = 'var(--yellow)';
+  } else if (chars > 80) {
+    counter.style.color = 'var(--red-text)';
+  } else {
+    counter.style.color = 'var(--text-dim)';
+  }
+});
+
+// Enter key triggers analyze
+document.getElementById('analyze-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); analyzeSubject(); }
+});
+
+// Init usage display
+updateUsageDisplay();
+</script>
+</body>
+</html>
