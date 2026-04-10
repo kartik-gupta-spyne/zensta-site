@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zensta — n8n Workflow Templates for Small Businesses</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #4361ee;
+            --accent-hover: #3a56d4;
+            --text: #2d2d2d;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-alt: #f8f9fb;
+            --border: #e5e7eb;
+            --green: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); line-height: 1.6; background: var(--bg); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+        nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .logo span { color: var(--accent); }
+
+        .hero { padding: 60px 0 40px; text-align: center; }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 12px; }
+        .hero p { color: var(--text-light); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+        .templates { padding: 20px 0 60px; }
+        .template-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: box-shadow 0.2s;
+        }
+        .template-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .template-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .template-header h2 { font-size: 1.4rem; }
+        .price { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
+        .template-card p { color: var(--text-light); margin-bottom: 16px; }
+        .features { list-style: none; margin-bottom: 20px; }
+        .features li { padding: 4px 0; padding-left: 24px; position: relative; }
+        .features li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+        .btn { display: inline-block; background: var(--accent); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+        .btn:hover { background: var(--accent-hover); }
+        .btn-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+        .btn-outline:hover { background: var(--accent); color: white; }
+
+        .bundle {
+            background: linear-gradient(135deg, #4361ee11, #10b98111);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 32px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .bundle h2 { font-size: 1.6rem; margin-bottom: 8px; }
+        .bundle .original-price { text-decoration: line-through; color: var(--text-light); margin-right: 8px; }
+        .bundle .bundle-price { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+        .bundle p { color: var(--text-light); margin: 12px 0 20px; }
+
+        footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-light); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">zen<span>sta</span></a>
+            <a href="mailto:mira@zensta.work" class="btn">Contact</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>n8n Workflow Templates</h1>
+            <p>Ready-to-import automation workflows for small businesses. Just add your API keys and go.</p>
+        </div>
+    </section>
+
+    <section class="templates">
+        <div class="container">
+
+            <div class="template-card">
+                <div class="template-header">
+                    <h2>AI Lead Response Bot</h2>
+                    <span class="price">$29</span>
+                </div>
+                <p>Automatically respond to contact form submissions with AI-personalized emails. Never leave a lead waiting again.</p>
+                <ul class="features">
+                    <li>Webhook trigger catches form submissions instantly</li>
+                    <li>OpenAI generates personalized, professional responses</li>
+                    <li>Auto-sends email reply within seconds</li>
+                    <li>Logs every lead to Google Sheets for tracking</li>
+                    <li>Works with any website contact form</li>
+                </ul>
+                <a href="mailto:mira@zensta.work?subject=Purchase: AI Lead Response Bot&body=Hi Mira, I'd like to purchase the AI Lead Response Bot n8n template ($29)." class="btn">Buy Template — $29</a>
+                <a href="/templates/ai-lead-response.json" class="btn btn-outline" style="margin-left: 8px;" download>Preview JSON</a>
+            </div>
+
+            <div class="template-card">
+                <div class="template-header">
+                    <h2>Social Media Content Generator</h2>
+                    <span class="price">$29</span>
+                </div>
+                <p>Generate a full week of social media content with one click. AI creates platform-specific posts for Twitter, LinkedIn, and Instagram.</p>
+                <ul class="features">
+                    <li>Weekly schedule trigger — set it and forget it</li>
+                    <li>Generates 7 unique posts per week using AI</li>
+                    <li>Platform-specific variations (Twitter, LinkedIn, Instagram)</li>
+                    <li>Outputs to Google Sheets for easy review and scheduling</li>
+                    <li>Customizable tone, industry, and brand voice</li>
+                </ul>
+                <a href="mailto:mira@zensta.work?subject=Purchase: Social Content Generator&body=Hi Mira, I'd like to purchase the Social Media Content Generator n8n template ($29)." class="btn">Buy Template — $29</a>
+                <a href="/templates/social-content-generator.json" class="btn btn-outline" style="margin-left: 8px;" download>Preview JSON</a>
+            </div>
+
+            <div class="template-card">
+                <div class="template-header">
+                    <h2>Review Monitor & Auto-Responder</h2>
+                    <span class="price">$39</span>
+                </div>
+                <p>Never miss a Google Business review. AI monitors reviews and generates appropriate responses — grateful for positive, empathetic for negative.</p>
+                <ul class="features">
+                    <li>Checks for new reviews every 6 hours</li>
+                    <li>AI classifies sentiment and generates matching responses</li>
+                    <li>Positive reviews get personalized thank-you replies</li>
+                    <li>Negative reviews get empathetic, professional responses</li>
+                    <li>Notifies owner with suggested response for approval</li>
+                </ul>
+                <a href="mailto:mira@zensta.work?subject=Purchase: Review Monitor&body=Hi Mira, I'd like to purchase the Review Monitor n8n template ($39)." class="btn">Buy Template — $39</a>
+                <a href="/templates/review-monitor.json" class="btn btn-outline" style="margin-left: 8px;" download>Preview JSON</a>
+            </div>
+
+            <div class="bundle">
+                <h2>All 3 Templates Bundle</h2>
+                <div>
+                    <span class="original-price">$97</span>
+                    <span class="bundle-price">$69</span>
+                </div>
+                <p>Save 29% — get all three workflow templates and any future updates.</p>
+                <a href="mailto:mira@zensta.work?subject=Purchase: Complete Bundle ($69)&body=Hi Mira, I'd like to purchase the complete n8n template bundle ($69 for all 3)." class="btn">Buy Bundle — $69</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built by Zensta — AI automation for small businesses</p>
+            <p style="margin-top: 8px;"><a href="/" style="color: var(--accent);">Home</a> · <a href="/demo.html" style="color: var(--accent);">AI Demo</a> · <a href="mailto:mira@zensta.work" style="color: var(--accent);">mira@zensta.work</a></p>
+        </div>
+    </footer>
+</body>
+</html>
