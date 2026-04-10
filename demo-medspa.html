@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Concierge Demo — Zensta</title>
+    <style>
+        :root {
+            --primary: #2e1a1a;
+            --accent: #c07a6e;
+            --accent-hover: #a8655a;
+            --accent-light: #fdf2ef;
+            --text: #2d2d2d;
+            --text-light: #6b7280;
+            --text-muted: #9ca3af;
+            --bg: #ffffff;
+            --bg-alt: #faf8f7;
+            --bg-chat: #f5f0ee;
+            --border: #e8e0dd;
+            --green: #10b981;
+            --green-light: #ecfdf5;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg-alt);
+            min-height: 100vh;
+        }
+
+        /* Top bar */
+        .top-bar {
+            background: var(--primary);
+            color: white;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+        }
+        .top-bar a {
+            color: #e8b4a8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .top-bar a:hover { text-decoration: underline; }
+
+        /* Header */
+        .demo-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 28px 0;
+        }
+        .demo-header .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .logo span { color: var(--accent); }
+
+        .demo-header h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .demo-header p {
+            color: var(--text-light);
+            font-size: 1rem;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* Chat container */
+        .chat-wrapper {
+            max-width: 520px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        .chat-window {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 580px;
+        }
+
+        /* Chat header (med spa branding) */
+        .chat-head {
+            background: linear-gradient(135deg, #8b5e5e, #c07a6e);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-head-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .chat-head-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+        .chat-head-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.78rem;
+            opacity: 0.9;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Messages area */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            scroll-behavior: smooth;
+        }
+        .chat-messages::-webkit-scrollbar { width: 5px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+        /* Message bubbles */
+        .msg-row {
+            display: flex;
+            gap: 8px;
+            max-width: 88%;
+            animation: msgIn 0.3s ease-out;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg-row.bot { align-self: flex-start; }
+        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5e5e, #c07a6e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .msg-row.user .msg-avatar {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .msg-row.bot .msg-bubble {
+            background: var(--bg-chat);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+        .msg-row.user .msg-bubble {
+            background: var(--accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            padding-left: 38px;
+        }
+        .msg-row.user + .msg-time { text-align: right; padding-right: 38px; padding-left: 0; }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            max-width: 88%;
+        }
+        .typing-indicator .msg-avatar {
+            width: 30px;
+            height: 30px;
+        }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: var(--bg-chat);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+        }
+        .typing-dots span {
+            width: 7px;
+            height: 7px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typingBounce 1.2s ease-in-out infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Suggested questions */
+        .suggestions {
+            padding: 0 16px 6px 16px;
+        }
+        .suggestions-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .suggestion-chip {
+            padding: 7px 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .suggestion-chip:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Input area */
+        .chat-input-area {
+            padding: 12px 16px 16px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .chat-input {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 24px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+            resize: none;
+            max-height: 80px;
+            line-height: 1.4;
+        }
+        .chat-input:focus { border-color: var(--accent); }
+        .chat-input::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .send-btn:hover { background: var(--accent-hover); }
+        .send-btn:disabled { background: #d1d5db; cursor: default; }
+        .send-btn svg { width: 18px; height: 18px; fill: white; }
+
+        /* CTA section */
+        .cta-section {
+            max-width: 520px;
+            margin: 0 auto 40px;
+            padding: 0 16px;
+        }
+        .cta-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 32px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .cta-card h3 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .cta-card p {
+            color: var(--text-light);
+            font-size: 0.92rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 13px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: background 0.15s;
+        }
+        .cta-btn:hover { background: var(--accent-hover); }
+        .cta-features {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .cta-feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: var(--text-light);
+        }
+        .cta-feature svg { width: 16px; height: 16px; color: var(--green); flex-shrink: 0; }
+
+        /* Footer */
+        .demo-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .demo-footer a { color: var(--accent); text-decoration: none; }
+        .demo-footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 560px) {
+            .demo-header h1 { font-size: 1.3rem; }
+            .chat-window { height: 520px; }
+            .cta-features { flex-direction: column; align-items: center; gap: 10px; }
+            .chat-head { padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        Powered by <a href="https://zensta.work">Zensta</a> &mdash; AI automation for small businesses
+    </div>
+
+    <header class="demo-header">
+        <div class="container">
+            <a href="https://zensta.work" class="logo">zen<span>sta</span></a>
+            <h1>See how Zensta's AI concierge handles your client inquiries</h1>
+            <p>This is a live demo. Try asking anything a client would message about &mdash; treatments, pricing, booking, memberships, or aftercare.</p>
+        </div>
+    </header>
+
+    <div class="chat-wrapper">
+        <div class="chat-window">
+            <!-- Chat header: looks like a real med spa widget -->
+            <div class="chat-head">
+                <div class="chat-head-avatar">&#x2728;</div>
+                <div class="chat-head-info">
+                    <h3>Radiance Med Spa</h3>
+                    <div class="chat-head-status">
+                        <span class="status-dot"></span>
+                        AI Concierge &middot; Online now
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Initial greeting injected by JS -->
+            </div>
+
+            <!-- Suggestions -->
+            <div class="suggestions" id="suggestionsArea">
+                <div class="suggestions-label">Try asking</div>
+                <div class="suggestion-chips" id="suggestionChips">
+                    <!-- Chips injected by JS -->
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="chat-input-row">
+                    <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn" aria-label="Send message">
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <div class="cta-card">
+            <h3>Want this for your med spa?</h3>
+            <p>We set up a custom AI concierge trained on your specific treatments, pricing, hours, and policies &mdash; ready to handle client inquiries 24/7.</p>
+            <a href="mailto:mira@zensta.work?subject=AI%20Concierge%20for%20my%20med%20spa&body=Hi%20Mira%2C%0A%0AI%20just%20tried%20the%20demo%20and%20I%27m%20interested%20in%20learning%20more%20about%20an%20AI%20concierge%20for%20my%20med%20spa.%0A%0ABusiness%20name%3A%20%0ALocation%3A%20%0AWebsite%3A%20%0A%0AThanks!" class="cta-btn">Get started &mdash; email mira@zensta.work</a>
+            <div class="cta-features">
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Setup in 48 hours
+                </div>
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    No contracts
+                </div>
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    24/7 availability
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        &copy; 2026 <a href="https://zensta.work">Zensta</a>. AI-powered automation for small businesses.
+    </div>
+
+<script>
+(function() {
+    // =====================================================================
+    // KNOWLEDGE BASE — med spa responses
+    // =====================================================================
+    const SPA = {
+        name: "Radiance Med Spa",
+        address: "8720 Sunset Boulevard, Suite 310, Los Angeles, CA 90069",
+        phone: "(310) 555-0291",
+        hours: {
+            "Monday":    "9:00 AM – 6:00 PM",
+            "Tuesday":   "9:00 AM – 7:00 PM",
+            "Wednesday": "9:00 AM – 6:00 PM",
+            "Thursday":  "9:00 AM – 7:00 PM",
+            "Friday":    "9:00 AM – 6:00 PM",
+            "Saturday":  "10:00 AM – 4:00 PM",
+            "Sunday":    "Closed"
+        }
+    };
+
+    // Suggested questions (shown as chips)
+    const SUGGESTIONS = [
+        "How much is Botox?",
+        "Book a consultation",
+        "What skincare treatments do you offer?",
+        "Laser hair removal info",
+        "Tell me about fillers",
+        "Membership plans"
+    ];
+
+    // Response patterns — each entry: { patterns: [...], responses: [...] }
+    const KB = [
+        // Appointment / booking / consultation
+        {
+            patterns: [/\b(appointment|book|schedule|come in|visit|consultation|consult|slot|opening|available|availability)\b/i],
+            responses: [
+                `I'd love to help you book an appointment! We have openings this week. Could you let me know:\n\n1. What **treatment** are you interested in? (Botox, fillers, laser, facial, etc.)\n2. Do you have a **preferred day/time**?\n3. Is this your **first visit** with us?\n\nIf you're not sure which treatment is right for you, I'd recommend starting with a **complimentary consultation** — our providers will create a personalized treatment plan just for you.`,
+                `Of course! I can get you scheduled. We currently have availability Tuesday and Thursday evenings, and Saturday morning.\n\nAre you looking to book a **specific treatment**, or would you prefer a **free consultation** first? Our consultations are no-obligation and include a full skin assessment with one of our expert providers.`
+            ]
+        },
+        // Hours / office hours
+        {
+            patterns: [/\b(hours|open|close|when are you|what time|operating|schedule.*office|office.*schedule|weekend)\b/i],
+            responses: [
+                `Here are our hours:\n\n**Mon, Wed, Fri:** 9:00 AM – 6:00 PM\n**Tue, Thu:** 9:00 AM – 7:00 PM\n**Saturday:** 10:00 AM – 4:00 PM\n**Sunday:** Closed\n\nWe're located at ${SPA.address}. Would you like to schedule a visit?`,
+                `Great question! We're open **Monday through Saturday**. Our latest hours are Tuesdays and Thursdays — we're open until 7:00 PM, which is perfect for after-work appointments.\n\nSaturdays are popular and book up quickly, so I'd recommend scheduling ahead. Want me to find you a time?`
+            ]
+        },
+        // Botox
+        {
+            patterns: [/\b(botox|boto|dysport|xeomin|jeuveau|neuromodulator|neurotoxin|wrinkle.*inject|forehead.*lines|crow.?s?\s*feet|frown\s*lines|11.*lines|eleven.*lines)\b/i],
+            responses: [
+                `Great question about Botox! Here's what we offer:\n\n**Botox Cosmetic** — $12 per unit\n**Dysport** — $10 per unit\n**Xeomin** — $11 per unit\n\n**Common treatment areas & typical units:**\n- Forehead lines: 10-30 units\n- Frown lines (11s): 15-25 units\n- Crow's feet: 10-15 units per side\n\n**What to expect:**\n- Treatment takes just 10-15 minutes\n- Minimal discomfort — feels like a small pinch\n- Results appear in 3-7 days, full effect at 2 weeks\n- Results last 3-4 months\n\nFirst-time clients receive a **free consultation** to determine the right dosage. Would you like to schedule one?`,
+                `We'd love to help you with Botox! We carry **Botox**, **Dysport**, and **Xeomin** — all FDA-approved neuromodulators.\n\nOur pricing is **$12/unit for Botox** and most clients use between 20-60 units depending on the areas treated. A typical full-face treatment runs **$250-$600**.\n\nAll injections are performed by our experienced nurse practitioners who specialize in natural-looking results. No "frozen" look here!\n\nWant to book a complimentary consultation? We'll map out a treatment plan tailored to your goals.`
+            ]
+        },
+        // Fillers
+        {
+            patterns: [/\b(filler|fillers|juvederm|restylane|sculptra|radiesse|voluma|lip.*inject|lip.*augment|cheek.*inject|nasolabial|marionette|under\s*eye|tear\s*trough|jawline.*contour)\b/i],
+            responses: [
+                `We offer a full range of dermal fillers:\n\n**Juvederm Collection**\n- Voluma (cheeks/midface): $750/syringe\n- Vollure (nasolabial folds): $700/syringe\n- Volbella (lips, fine lines): $650/syringe\n\n**Restylane Collection**\n- Contour (cheeks): $725/syringe\n- Defyne (jawline, marionette): $700/syringe\n- Kysse (lips): $675/syringe\n\n**Sculptra** — $800/vial (collagen stimulator)\n**Radiesse** — $750/syringe (hand rejuvenation, cheeks)\n\n**Popular treatments:**\n- Lip enhancement: 1-2 syringes ($650-$1,300)\n- Cheek contouring: 1-2 syringes ($700-$1,500)\n- Full liquid facelift: 3-6 syringes ($2,100-$4,500)\n\nResults are immediate and last **6-18 months** depending on the product. Would you like to book a consultation?`,
+                `Dermal fillers are one of our most popular treatments! We use premium brands including **Juvederm**, **Restylane**, **Sculptra**, and **Radiesse**.\n\nStarting at **$650 per syringe**, fillers can add volume to lips, smooth lines, contour cheeks and jawline, and treat under-eye hollows.\n\nOur injectors have years of advanced training and focus on **natural, balanced results**. During your consultation, we'll discuss your goals and recommend the best product for your needs.\n\nWant to schedule a complimentary filler consultation?`
+            ]
+        },
+        // Laser hair removal
+        {
+            patterns: [/\b(laser\s*hair|hair\s*remov|laser.*remov|unwanted\s*hair|smooth\s*skin|shav|wax.*alternative)\b/i],
+            responses: [
+                `Laser hair removal is one of our most requested services! Here's an overview:\n\n**Pricing per session:**\n- Upper lip or chin: $75\n- Underarms: $125\n- Bikini line: $150\n- Full bikini/Brazilian: $250\n- Half legs: $300\n- Full legs: $500\n- Full back: $400\n- Full body packages available\n\n**What to expect:**\n- 6-8 sessions recommended, spaced 4-6 weeks apart\n- Each session takes 15-60 minutes depending on area\n- We use the **Soprano ICE Platinum** laser — safe for all skin tones\n- Most clients see **80-90% permanent reduction**\n\n**Package discount:** Buy 5 sessions, get the 6th free!\n\nWould you like to book a consultation? We'll assess your skin and hair type and create a custom plan.`
+            ]
+        },
+        // Skincare / facials
+        {
+            patterns: [/\b(skincare|skin\s*care|facial|facials|hydrafacial|chemical\s*peel|peel|microneedling|micro\s*needling|dermaplaning|glow|complexion|acne.*treat|pigment|dark\s*spot|melasma|anti.?aging|rejuvenat)\b/i],
+            responses: [
+                `We have a wonderful selection of skincare treatments:\n\n**Facials**\n- Signature Radiance Facial: $175\n- HydraFacial: $225\n- HydraFacial Deluxe (with boosters): $325\n- LED Light Therapy add-on: +$50\n\n**Peels**\n- Light glow peel: $150\n- Medium-depth peel: $250\n- VI Peel: $350\n\n**Advanced Treatments**\n- Microneedling: $350\n- Microneedling with PRP: $550\n- Dermaplaning: $125\n- IPL Photofacial: $300\n\nNot sure which is right for you? I'd recommend booking a **skin consultation** — our estheticians will analyze your skin and recommend a personalized treatment plan.\n\nWhat are your main skin concerns? (Aging, acne, pigmentation, texture, etc.)`,
+                `Great question! Our skincare menu is designed for every concern and skin type.\n\nOur most popular treatments right now are the **HydraFacial** ($225) for an instant glow, **microneedling** ($350) for texture and fine lines, and our **VI Peel** ($350) for pigmentation and acne scars.\n\nAll treatments start with a thorough skin analysis so we can customize the approach. Would you like to tell me what you're looking to address? I can recommend the best treatment for your goals.`
+            ]
+        },
+        // Laser treatments (non-hair)
+        {
+            patterns: [/\b(laser\s*treat|laser\s*skin|ipl|photofacial|laser\s*resurfac|fraxel|co2\s*laser|halo\s*laser|bbl|broadband|redness|vein|spider\s*vein|broken\s*capillar|sun\s*damage|age\s*spot|laser\s*facial)\b/i],
+            responses: [
+                `We offer several advanced laser treatments:\n\n**IPL Photofacial** — $300/session\nTargets sun damage, age spots, redness, and broken capillaries. Series of 3-5 recommended.\n\n**Laser Skin Resurfacing** — $500-$1,500\nStimulates collagen for smoother, tighter skin. Options range from gentle to aggressive depending on your goals.\n\n**Laser Vein Treatment** — $250-$400/session\nReduces spider veins on face and legs.\n\n**BBL (BroadBand Light)** — $350/session\nThe gold standard for sun damage, pigmentation, and overall skin rejuvenation.\n\n**Recovery varies** by treatment — IPL has minimal downtime (1-3 days of slight redness), while resurfacing may require 5-7 days of peeling.\n\nWould you like to book a laser consultation? Our providers will assess your skin and recommend the most effective option.`
+            ]
+        },
+        // Body contouring
+        {
+            patterns: [/\b(body\s*contour|coolsculpt|emsculpt|sculpt|fat\s*reduc|fat\s*freez|cellulite|body\s*shap|slim|tighten.*body|body.*tighten|non.?surgical.*body)\b/i],
+            responses: [
+                `We offer non-surgical body contouring treatments:\n\n**CoolSculpting** — from $750/cycle\nFreezes and eliminates stubborn fat. Common areas: abdomen, flanks (love handles), thighs, double chin. Results develop over 2-3 months as your body naturally eliminates fat cells.\n\n**EMSculpt NEO** — $1,000/session\nBuilds muscle AND reduces fat simultaneously. Popular for abs, glutes, arms, and calves. Equivalent to 20,000 crunches in 30 minutes!\n\n**Recommended treatment plans:**\n- CoolSculpting: 1-3 cycles per area\n- EMSculpt NEO: 4 sessions over 2 weeks\n\n**Package pricing available** — save up to 20% when you purchase a series.\n\nResults are long-lasting with a healthy lifestyle. Would you like to schedule a body contouring consultation? We'll take measurements and photos to create a personalized plan.`
+            ]
+        },
+        // Membership / packages
+        {
+            patterns: [/\b(membership|member|package|plan|subscribe|subscription|loyalty|reward|program|discount|bundle|monthly|vip)\b/i],
+            responses: [
+                `Great question! We offer a **Radiance VIP Membership** — it's our most popular way to save:\n\n**Glow Membership** — $99/month\n- 1 HydraFacial OR signature facial per month\n- 10% off all injectable treatments\n- 15% off skincare products\n- Priority booking\n\n**Luxe Membership** — $199/month\n- Everything in Glow, PLUS:\n- 1 additional treatment per month (peel, dermaplaning, or LED)\n- 15% off all injectable treatments\n- 20% off skincare products\n- Free birthday treatment\n- Exclusive member events\n\n**Injectable Packages:**\n- Botox Club: Prepay 100 units, get 10 free ($1,200 value for $1,080)\n- Filler Loyalty: Buy 2 syringes, get $100 off the 3rd\n\nMemberships have **no long-term contracts** — cancel anytime after 3 months. Would you like to sign up or learn more?`,
+                `Our membership program is a fantastic value! Starting at just **$99/month**, you get a monthly facial, discounts on injectables, and savings on skincare products.\n\nMany of our members save **$1,500-$3,000 per year** compared to paying per treatment. It's perfect if you're committed to a consistent skincare routine.\n\nWould you like me to go over the details, or would you like to sign up during your next visit?`
+            ]
+        },
+        // Pricing / cost / how much
+        {
+            patterns: [/\b(cost|price|pricing|how much|fee|charge|pay|payment|finance|financing|afford|expensive|cheap|rate)\b/i],
+            responses: [
+                `Here's an overview of our popular treatments and pricing:\n\n**Injectables**\n- Botox: $12/unit (avg. treatment $250-$600)\n- Dermal fillers: from $650/syringe\n\n**Skincare**\n- HydraFacial: $225\n- Chemical peels: $150-$350\n- Microneedling: $350-$550\n\n**Laser**\n- Laser hair removal: from $75/session\n- IPL Photofacial: $300/session\n\n**Body**\n- CoolSculpting: from $750/cycle\n- EMSculpt NEO: $1,000/session\n\n**Ways to save:**\n- Membership plans from $99/month with ongoing discounts\n- Package pricing on treatment series\n- We accept **CareCredit** and **Cherry financing** with 0% interest options\n- Seasonal promotions (ask about current specials!)\n\nWould you like details on any specific treatment?`
+            ]
+        },
+        // Recovery / downtime / aftercare
+        {
+            patterns: [/\b(recovery|downtime|after\s*care|aftercare|heal|healing|side\s*effect|bruise|bruising|swell|swelling|how long|when can i|resume|back to work|go out)\b/i],
+            responses: [
+                `Great question! Recovery varies by treatment. Here's a quick guide:\n\n**Minimal to no downtime (back to normal same day):**\n- Botox — avoid exercise for 24 hrs, no lying down for 4 hrs\n- HydraFacial — immediate glow, no downtime\n- Dermaplaning — slight sensitivity for 24 hrs\n\n**1-3 days:**\n- Dermal fillers — possible swelling/bruising for 2-5 days\n- IPL Photofacial — mild redness for 1-3 days\n- Light chemical peels — slight flaking for 1-2 days\n\n**5-7 days:**\n- Medium chemical peels — peeling for 5-7 days\n- Microneedling — redness for 2-4 days\n- Laser resurfacing — redness and peeling for 5-7 days\n\n**2-4 weeks (full recovery):**\n- Deep peels and aggressive laser treatments\n\nWe provide detailed aftercare instructions for every treatment. Which treatment are you considering? I can give you specific guidance.`
+            ]
+        },
+        // Injectable brands / what do you use
+        {
+            patterns: [/\b(brand|product|what.*use|which.*brand|allergan|galderma|merz|fda|approved|safe|ingredient)\b/i],
+            responses: [
+                `We only use **FDA-approved products** from the leading manufacturers:\n\n**Allergan Aesthetics:**\n- Botox Cosmetic\n- Juvederm collection (Voluma, Vollure, Volbella)\n- SkinMedica skincare\n\n**Galderma:**\n- Restylane collection (Contour, Defyne, Kysse)\n- Sculptra\n\n**Merz Aesthetics:**\n- Xeomin\n- Radiesse\n\n**Revance:**\n- Daxxify (long-lasting neuromodulator)\n\nAll our products are purchased directly from the manufacturers — never from third-party sources. Your safety is our top priority.\n\nOur providers stay current with the latest techniques through ongoing advanced training. Would you like to know more about any specific product?`
+            ]
+        },
+        // Cancellation / reschedule
+        {
+            patterns: [/\b(cancel|reschedule|change|move|postpone|rain check|can't make it|won't make it|cancellation\s*polic|no.?show)\b/i],
+            responses: [
+                `No problem! We understand plans change.\n\nHere's our cancellation policy:\n\n- **24+ hours notice:** No charge — reschedule anytime\n- **Less than 24 hours:** $50 late cancellation fee\n- **No-show:** Full treatment fee may be charged\n\nWe enforce this policy because our providers reserve time specifically for you, and last-minute cancellations prevent other clients from booking.\n\nWould you like to:\n1. **Reschedule** to a different day/time?\n2. **Cancel** and rebook later?\n\nJust let me know your name and preferred new date, and I'll get it sorted!`
+            ]
+        },
+        // Services / what do you offer
+        {
+            patterns: [/\b(services|offer|procedures|what do you do|treatments|what kind|types of|menu)\b/i],
+            responses: [
+                `We offer a comprehensive range of aesthetic treatments:\n\n**Injectables**\n- Botox, Dysport, Xeomin\n- Dermal fillers (lips, cheeks, jawline, under-eyes)\n- Kybella (double chin reduction)\n\n**Skin Treatments**\n- HydraFacial & custom facials\n- Chemical peels\n- Microneedling & PRP\n- Dermaplaning\n\n**Laser Services**\n- Laser hair removal\n- IPL Photofacial\n- Laser skin resurfacing\n- Vein treatment\n\n**Body Contouring**\n- CoolSculpting\n- EMSculpt NEO\n\n**Skincare**\n- Medical-grade skincare products\n- Personalized skincare regimens\n\nAll treatments are performed by licensed, experienced providers. Is there something specific you're interested in? I'm happy to share details and pricing.`
+            ]
+        },
+        // New client / first time
+        {
+            patterns: [/\b(new client|new patient|first time|first visit|never been|haven.t been|new here|just moved)\b/i],
+            responses: [
+                `Welcome! We're so excited to have you. Here's what to expect at your first visit:\n\n**Your first appointment includes:**\n- In-depth consultation with your provider\n- Skin assessment and analysis\n- Personalized treatment plan\n- Any agreed-upon treatment\n\n**What to bring:**\n- Photo ID\n- List of current medications and skincare products\n- Any relevant medical history\n\n**New client special:** Enjoy **$50 off your first treatment** of $200 or more!\n\nWe'll send you digital intake forms by email so you can complete them before your visit — no paperwork in the waiting room.\n\nWould you like to start with a **complimentary consultation**? There's no pressure — just expert advice on reaching your aesthetic goals.`
+            ]
+        },
+        // Location / directions / address
+        {
+            patterns: [/\b(location|address|where|directions|parking|find you|located|map)\b/i],
+            responses: [
+                `We're located at:\n\n**${SPA.address}**\n\nWe're on the third floor of the Sunset Medical Building, with a beautiful view of the hills. There's **validated parking** in the garage beneath the building — enter from the side street.\n\nIf you're coming from the 405, take the Sunset Blvd exit and head east. We're about 5 minutes from the highway, on the right side.\n\nNeed help finding us? Call us at **${SPA.phone}** and we'll guide you in!`
+            ]
+        },
+        // Greeting / hello
+        {
+            patterns: [/^(hi|hello|hey|good morning|good afternoon|good evening|howdy|hola|sup|yo|what's up)\b/i],
+            responses: [
+                `Hi there! Welcome to ${SPA.name}. I'm your AI concierge — available 24/7 to help.\n\nI can help you with:\n- **Booking** a consultation or treatment\n- **Treatment info** and pricing\n- **Membership** plans and packages\n- **Recovery** and aftercare questions\n- **Products** and skincare recommendations\n\nWhat can I help you with today?`,
+                `Hello! Thanks for reaching out to ${SPA.name}. How can I help you today? Whether it's booking an appointment, learning about our treatments, or checking on pricing — I'm here for you!`
+            ]
+        },
+        // Thanks / bye
+        {
+            patterns: [/\b(thank|thanks|thx|bye|goodbye|see you|take care|appreciate|that's all|that's it)\b/i],
+            responses: [
+                `You're welcome! If you need anything else, don't hesitate to reach out. We're always here to help you look and feel your best.\n\nHave a beautiful day!`,
+                `Happy to help! If any other questions come up, just message us anytime. We look forward to seeing you at the spa!\n\nTake care!`
+            ]
+        },
+        // Skin care product recommendations
+        {
+            patterns: [/\b(product|recommend|routine|serum|moisturiz|sunscreen|retinol|vitamin\s*c|hyaluronic|cleanser|skincare\s*routine|what should i use|home\s*care)\b/i],
+            responses: [
+                `We carry medical-grade skincare lines that deliver real results:\n\n**Our Featured Brands:**\n- SkinMedica (by Allergan)\n- SkinCeuticals\n- EltaMD (sunscreens)\n- Revision Skincare\n\n**Essential routine we recommend:**\n1. **Cleanser** — gentle, pH-balanced ($35-$48)\n2. **Vitamin C serum** — antioxidant protection ($95-$166)\n3. **Moisturizer** — hydration and barrier repair ($52-$85)\n4. **SPF 30+** — non-negotiable! ($28-$42)\n5. **Retinol** (PM) — the gold standard for anti-aging ($65-$120)\n\nMembers receive **15-20% off** all skincare products!\n\nFor a personalized recommendation, I'd suggest booking a **skin consultation** — our estheticians will analyze your skin and build a custom routine. Would you like to schedule one?`
+            ]
+        },
+        // Kybella / double chin
+        {
+            patterns: [/\b(kybella|double\s*chin|chin\s*fat|submental|jawline\s*slim)\b/i],
+            responses: [
+                `Kybella is a fantastic non-surgical option for reducing under-chin fullness!\n\n**Kybella Treatment:**\n- $600 per vial (most clients need 2-4 vials per session)\n- 2-4 treatment sessions, spaced 4-6 weeks apart\n- Permanent fat cell destruction — results are lasting\n- Minimal downtime (swelling for 3-7 days)\n\n**What to expect:**\n- Small injections under the chin (takes about 15 minutes)\n- Noticeable improvement after 2-3 sessions\n- Full results in 3-6 months\n\nKybella is a great alternative to liposuction for the right candidate. Would you like to book a consultation to see if you're a good fit?`
+            ]
+        }
+    ];
+
+    // Fallback for unmatched queries
+    const FALLBACK_RESPONSES = [
+        `That's a great question! For the most accurate answer, I'd recommend calling us at **${SPA.phone}** or I can have our team follow up with you.\n\nIn the meantime, is there anything else I can help with — like scheduling, treatment info, or pricing?`,
+        `I want to make sure I give you the right information on that. Let me connect you with our team — you can reach us at **${SPA.phone}** during business hours, or I can have someone call you back.\n\nIs there anything else I can help with right now?`,
+        `Good question! That's something our providers would be best to answer in person. Would you like to schedule a complimentary consultation? I can get you in this week.\n\nOr feel free to call us at **${SPA.phone}** for a quick answer.`
+    ];
+
+    // =====================================================================
+    // CHAT ENGINE
+    // =====================================================================
+
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const suggestionsArea = document.getElementById('suggestionsArea');
+    const suggestionChips = document.getElementById('suggestionChips');
+
+    let isTyping = false;
+
+    // Format bold/markdown-ish text
+    function formatText(text) {
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n/g, '<br>');
+        return text;
+    }
+
+    // Add a message to chat
+    function addMessage(text, sender) {
+        const row = document.createElement('div');
+        row.className = `msg-row ${sender}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'msg-avatar';
+        avatar.textContent = sender === 'bot' ? '\u2728' : 'You';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.innerHTML = formatText(text);
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+
+    // Show typing indicator
+    function showTyping() {
+        isTyping = true;
+        const el = document.createElement('div');
+        el.className = 'typing-indicator';
+        el.id = 'typingIndicator';
+        el.innerHTML = `
+            <div class="msg-avatar" style="background: linear-gradient(135deg, #8b5e5e, #c07a6e); color: white; font-size: 0.75rem;">\u2728</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+        `;
+        messagesEl.appendChild(el);
+        scrollToBottom();
+    }
+
+    // Hide typing indicator
+    function hideTyping() {
+        isTyping = false;
+        const el = document.getElementById('typingIndicator');
+        if (el) el.remove();
+    }
+
+    function scrollToBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    // Find the best matching response
+    function getResponse(input) {
+        const text = input.trim();
+        if (!text) return null;
+
+        for (const entry of KB) {
+            for (const pattern of entry.patterns) {
+                if (pattern.test(text)) {
+                    const responses = entry.responses;
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+            }
+        }
+
+        return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)];
+    }
+
+    // Handle sending a message
+    function sendMessage(text) {
+        if (isTyping) return;
+        const msg = (text || inputEl.value).trim();
+        if (!msg) return;
+
+        addMessage(msg, 'user');
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        updateSendBtn();
+
+        suggestionsArea.style.display = 'none';
+
+        const delay = 600 + Math.random() * 800;
+        showTyping();
+
+        setTimeout(() => {
+            hideTyping();
+            const response = getResponse(msg);
+            addMessage(response, 'bot');
+
+            if (Math.random() > 0.5) {
+                showFollowUpSuggestions(msg);
+            }
+        }, delay);
+    }
+
+    // Show contextual follow-up suggestion chips
+    function showFollowUpSuggestions(lastMsg) {
+        const followUps = [];
+        const lower = lastMsg.toLowerCase();
+
+        if (/botox|neuromodulator|dysport/i.test(lower)) {
+            followUps.push("Book a Botox appointment", "Tell me about fillers");
+        } else if (/filler|lip|cheek|jawline/i.test(lower)) {
+            followUps.push("Book a filler consultation", "How much is Botox?");
+        } else if (/appointment|book|schedule|consult/i.test(lower)) {
+            followUps.push("What are your hours?", "What treatments do you offer?");
+        } else if (/hours|open|close/i.test(lower)) {
+            followUps.push("Book a consultation", "Where are you located?");
+        } else if (/cost|price|how much/i.test(lower)) {
+            followUps.push("Membership plans", "Book a consultation");
+        } else if (/laser.*hair|hair.*remov/i.test(lower)) {
+            followUps.push("Book a laser consultation", "What other laser treatments?");
+        } else if (/skincare|facial|peel|microneedling/i.test(lower)) {
+            followUps.push("Book a facial", "Product recommendations");
+        } else if (/member|package|plan/i.test(lower)) {
+            followUps.push("Sign me up!", "What treatments do you offer?");
+        } else if (/recovery|downtime|aftercare/i.test(lower)) {
+            followUps.push("Book an appointment", "Tell me about Botox");
+        } else if (/body|coolsculpt|emsculpt|contour/i.test(lower)) {
+            followUps.push("Book a body contouring consult", "How much does it cost?");
+        } else {
+            followUps.push("Book a consultation", "What treatments do you offer?");
+        }
+
+        if (followUps.length > 0) {
+            setTimeout(() => {
+                suggestionsArea.style.display = 'block';
+                const label = suggestionsArea.querySelector('.suggestions-label');
+                if (label) label.textContent = 'You might also ask';
+                renderChips(followUps);
+            }, 300);
+        }
+    }
+
+    // Render suggestion chips
+    function renderChips(items) {
+        suggestionChips.innerHTML = '';
+        items.forEach(text => {
+            const chip = document.createElement('button');
+            chip.className = 'suggestion-chip';
+            chip.textContent = text;
+            chip.addEventListener('click', () => sendMessage(text));
+            suggestionChips.appendChild(chip);
+        });
+    }
+
+    // Update send button state
+    function updateSendBtn() {
+        sendBtn.disabled = !inputEl.value.trim();
+    }
+
+    // Auto-resize textarea
+    function autoResize() {
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 80) + 'px';
+    }
+
+    // =====================================================================
+    // INIT
+    // =====================================================================
+
+    renderChips(SUGGESTIONS);
+
+    setTimeout(() => {
+        addMessage(
+            `Hi there! Welcome to ${SPA.name}. I'm your AI concierge — available 24/7 to help.\n\nI can assist you with:\n- **Booking** a consultation or treatment\n- **Treatment info** — Botox, fillers, facials, laser & more\n- **Pricing** and payment options\n- **Membership** plans and packages\n- **Recovery** and aftercare guidance\n\nHow can I help you today?`,
+            'bot'
+        );
+    }, 400);
+
+    // Event listeners
+    inputEl.addEventListener('input', () => {
+        updateSendBtn();
+        autoResize();
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    sendBtn.addEventListener('click', () => sendMessage());
+
+    updateSendBtn();
+})();
+</script>
+
+</body>
+</html>
