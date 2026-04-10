@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="100" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="white">zen<tspan fill="#4361ee">sta</tspan></text>
+  <text x="100" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="40" fill="#a0aec0">AI Automation for Small Businesses</text>
+  <text x="100" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#718096">AI Receptionist &bull; Review Reply Generator &bull; Business Name AI</text>
+  <text x="100" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#718096">n8n Workflow Templates &bull; Email Subject Line Analyzer</text>
+  <text x="100" y="540" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#4361ee">zensta.work &bull; Free tools, no signup required</text>
+</svg>
