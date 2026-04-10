@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zensta — Free AI Tools for Small Businesses</title>
+    <style>
+        :root { --primary: #1a1a2e; --accent: #4361ee; --accent-hover: #3a56d4; --text: #2d2d2d; --text-light: #6b7280; --bg: #fff; --bg-alt: #f8f9fb; --border: #e5e7eb; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); line-height: 1.6; background: var(--bg); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+        nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .logo span { color: var(--accent); }
+        .hero { padding: 60px 0 20px; text-align: center; }
+        .hero h1 { font-size: 2.4rem; margin-bottom: 12px; }
+        .hero p { color: var(--text-light); font-size: 1.15rem; max-width: 600px; margin: 0 auto 40px; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; padding: 20px 0 60px; }
+        .tool-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+        .tool-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .tool-img { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+        .tool-body { padding: 24px; }
+        .tool-body h3 { font-size: 1.2rem; margin-bottom: 6px; }
+        .tool-body p { color: var(--text-light); font-size: 0.95rem; margin-bottom: 16px; }
+        .tool-meta { display: flex; justify-content: space-between; align-items: center; }
+        .badge { font-size: 0.8rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+        .badge-free { background: #d1fae5; color: #065f46; }
+        .badge-paid { background: #dbeafe; color: #1e40af; }
+        .btn-sm { display: inline-block; background: var(--accent); color: white; padding: 8px 20px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        .btn-sm:hover { background: var(--accent-hover); }
+        footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-light); font-size: 0.9rem; }
+        footer a { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <nav><div class="container"><a href="/" class="logo">zen<span>sta</span></a><a href="mailto:mira@zensta.work" class="btn-sm">Contact</a></div></nav>
+
+    <section class="hero"><div class="container">
+        <h1>Free AI Tools for Your Business</h1>
+        <p>No signup required. No API keys. Just open and use. Built for small business owners who want AI without the complexity.</p>
+    </div></section>
+
+    <section class="container">
+        <div class="tools-grid">
+
+            <a href="/replypro.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5)">&#11088;</div>
+                <div class="tool-body">
+                    <h3>ReplyPro</h3>
+                    <p>AI-powered Google Review reply generator. Paste a review, get a professional response in seconds.</p>
+                    <div class="tool-meta"><span class="badge badge-free">5 free/month</span><span class="btn-sm">Try it</span></div>
+                </div>
+            </a>
+
+            <a href="/nameforge.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#eef2ff,#dbeafe)">&#128161;</div>
+                <div class="tool-body">
+                    <h3>NameForge AI</h3>
+                    <p>Generate creative business names instantly. Industry-specific, style-matched, with domain availability hints.</p>
+                    <div class="tool-meta"><span class="badge badge-free">3 free generations</span><span class="btn-sm">Try it</span></div>
+                </div>
+            </a>
+
+            <a href="/demo.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">&#129463;</div>
+                <div class="tool-body">
+                    <h3>Dental AI Receptionist</h3>
+                    <p>Interactive demo: See how an AI handles patient questions, books appointments, and answers insurance queries.</p>
+                    <div class="tool-meta"><span class="badge badge-free">Free demo</span><span class="btn-sm">Try it</span></div>
+                </div>
+            </a>
+
+            <a href="/demo-medspa.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#fdf2f8,#fce7f3)">&#10024;</div>
+                <div class="tool-body">
+                    <h3>Med Spa AI Concierge</h3>
+                    <p>Interactive demo: AI handles Botox pricing, consultation booking, treatment questions, and membership plans.</p>
+                    <div class="tool-meta"><span class="badge badge-free">Free demo</span><span class="btn-sm">Try it</span></div>
+                </div>
+            </a>
+
+            <a href="/demo-realestate.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#fefce8,#fef3c7)">&#127968;</div>
+                <div class="tool-body">
+                    <h3>Real Estate AI Assistant</h3>
+                    <p>Interactive demo: AI handles property inquiries, schedules viewings, answers mortgage questions 24/7.</p>
+                    <div class="tool-meta"><span class="badge badge-free">Free demo</span><span class="btn-sm">Try it</span></div>
+                </div>
+            </a>
+
+            <a href="/templates.html" class="tool-card" style="text-decoration:none;color:inherit">
+                <div class="tool-img" style="background:linear-gradient(135deg,#faf5ff,#ede9fe)">&#9889;</div>
+                <div class="tool-body">
+                    <h3>n8n Workflow Templates</h3>
+                    <p>Ready-to-import automation workflows. Lead response bot, social content generator, review monitor.</p>
+                    <div class="tool-meta"><span class="badge badge-paid">From $29</span><span class="btn-sm">Browse</span></div>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <footer><div class="container">
+        <p>Built by <a href="/">Zensta</a> — AI automation for small businesses</p>
+        <p style="margin-top:8px"><a href="/">Home</a> &middot; <a href="mailto:mira@zensta.work">mira@zensta.work</a></p>
+    </div></footer>
+</body>
+</html>
