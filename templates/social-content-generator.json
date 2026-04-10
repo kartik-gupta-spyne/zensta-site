@@ -1,0 +1,270 @@
+{
+  "name": "Social Media Content Generator - Weekly Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Weekly Schedule - Monday 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300],
+      "notes": "Runs every Monday at 9:00 AM to generate the week's content. Adjust the cron expression to change the day/time. Format: minute hour day-of-month month day-of-week."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-business",
+              "name": "businessName",
+              "value": "[YOUR BUSINESS NAME]",
+              "type": "string"
+            },
+            {
+              "id": "set-industry",
+              "name": "industry",
+              "value": "[YOUR INDUSTRY - e.g., dental practice, restaurant, real estate]",
+              "type": "string"
+            },
+            {
+              "id": "set-tone",
+              "name": "brandTone",
+              "value": "professional yet friendly and approachable",
+              "type": "string"
+            },
+            {
+              "id": "set-topics",
+              "name": "keyTopics",
+              "value": "[YOUR KEY TOPICS - e.g., teeth whitening, patient stories, dental tips, office culture]",
+              "type": "string"
+            },
+            {
+              "id": "set-week",
+              "name": "weekStarting",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "set-hashtags",
+              "name": "brandHashtags",
+              "value": "[YOUR BRAND HASHTAGS - e.g., #YourBrand #YourCity #YourIndustry]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-settings",
+      "name": "Business Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300],
+      "notes": "CONFIGURE THIS NODE: Replace the placeholder values with your actual business info. This drives the AI content generation for all platforms."
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "You are an expert social media content strategist. You create engaging, platform-optimized content that drives engagement and builds brand authority.\n\nRules:\n- Each post must be unique and provide genuine value\n- Mix content types: educational, entertaining, promotional (80/20 rule: 80% value, 20% promotional)\n- Use hooks that stop the scroll\n- Include relevant emojis naturally\n- Vary post formats: tips, questions, stories, behind-the-scenes, testimonials, industry news\n- Never use generic filler content",
+              "role": "system"
+            },
+            {
+              "content": "Create a 7-day social media content calendar for this business:\n\nBusiness: {{ $json.businessName }}\nIndustry: {{ $json.industry }}\nBrand Tone: {{ $json.brandTone }}\nKey Topics: {{ $json.keyTopics }}\nBrand Hashtags: {{ $json.brandHashtags }}\nWeek Starting: {{ $json.weekStarting }}\n\nFor EACH of the 7 days (Monday through Sunday), create content in this EXACT JSON format. Return a JSON array of 7 objects:\n\n[\n  {\n    \"day\": \"Monday\",\n    \"date\": \"YYYY-MM-DD\",\n    \"theme\": \"content theme for the day\",\n    \"twitter\": {\n      \"text\": \"Tweet text (max 280 chars, include 2-3 hashtags)\",\n      \"type\": \"tip | question | story | stat | promotional\"\n    },\n    \"linkedin\": {\n      \"text\": \"LinkedIn post (300-600 chars, professional tone, include hashtags at end)\",\n      \"type\": \"thought-leadership | case-study | tip | industry-news | behind-the-scenes\"\n    },\n    \"instagram\": {\n      \"caption\": \"Instagram caption (engaging, with line breaks, emojis, 5-10 hashtags at end)\",\n      \"imagePrompt\": \"A description of what image/graphic to create for this post\",\n      \"type\": \"carousel | single-image | reel-script | story\"\n    }\n  }\n]\n\nReturn ONLY the JSON array, no other text.",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.85,
+          "maxTokens": 4000
+        }
+      },
+      "id": "openai-generate-content",
+      "name": "AI Generate Weekly Content",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [680, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Generates all 7 days of content across Twitter, LinkedIn, and Instagram in one API call. Uses GPT-4o-mini for cost efficiency. Adjust temperature (0.85) for more/less creativity."
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $input.first().json;\nlet posts;\n\ntry {\n  // Parse the AI response - handle both direct array and wrapped response\n  const responseText = content.message.content;\n  posts = JSON.parse(responseText);\n} catch (e) {\n  // Try to extract JSON from markdown code blocks\n  const match = content.message.content.match(/\\[\\s*\\{[\\s\\S]*\\}\\s*\\]/);\n  if (match) {\n    posts = JSON.parse(match[0]);\n  } else {\n    throw new Error('Could not parse AI response as JSON. Raw: ' + content.message.content.substring(0, 200));\n  }\n}\n\n// Return each day as a separate item for the Google Sheets node\nreturn posts.map(post => ({\n  json: {\n    day: post.day,\n    date: post.date,\n    theme: post.theme,\n    twitter_text: post.twitter.text,\n    twitter_type: post.twitter.type,\n    linkedin_text: post.linkedin.text,\n    linkedin_type: post.linkedin.type,\n    instagram_caption: post.instagram.caption,\n    instagram_image_prompt: post.instagram.imagePrompt,\n    instagram_type: post.instagram.type,\n    status: 'Draft - Needs Review',\n    generated_at: new Date().toISOString()\n  }\n}));"
+      },
+      "id": "parse-content",
+      "name": "Parse & Split Into Days",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "notes": "Parses the AI JSON response and splits it into 7 separate items (one per day). Each item contains the Twitter, LinkedIn, and Instagram content flattened into columns for the spreadsheet."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Content Calendar"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Day": "={{ $json.day }}",
+            "Date": "={{ $json.date }}",
+            "Theme": "={{ $json.theme }}",
+            "Twitter Text": "={{ $json.twitter_text }}",
+            "Twitter Type": "={{ $json.twitter_type }}",
+            "LinkedIn Text": "={{ $json.linkedin_text }}",
+            "LinkedIn Type": "={{ $json.linkedin_type }}",
+            "Instagram Caption": "={{ $json.instagram_caption }}",
+            "Instagram Image Prompt": "={{ $json.instagram_image_prompt }}",
+            "Instagram Type": "={{ $json.instagram_type }}",
+            "Status": "={{ $json.status }}",
+            "Generated At": "={{ $json.generated_at }}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "write-to-sheets",
+      "name": "Write to Content Calendar Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1120, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "notes": "Writes all 7 days of content to your Google Sheet. Create a sheet named 'Content Calendar' with columns: Day, Date, Theme, Twitter Text, Twitter Type, LinkedIn Text, LinkedIn Type, Instagram Caption, Instagram Image Prompt, Instagram Type, Status, Generated At."
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=Your Weekly Content Calendar is Ready ({{ $('Business Configuration').item.json.weekStarting }})",
+        "message": "=Hi! Your social media content calendar for the week of {{ $('Business Configuration').item.json.weekStarting }} has been generated.\n\n7 days of content across Twitter, LinkedIn, and Instagram are ready for your review.\n\nOpen your content calendar spreadsheet to review, edit, and approve each post before publishing.\n\nRemember: AI-generated content is a starting point. Review each post and add your personal touch before publishing.\n\n- Your AI Content Assistant",
+        "options": {}
+      },
+      "id": "send-notification",
+      "name": "Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1340, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      },
+      "notes": "Sends you an email notification when the weekly content is ready for review. Change the sendTo address to your email."
+    }
+  ],
+  "connections": {
+    "Weekly Schedule - Monday 9 AM": {
+      "main": [
+        [
+          {
+            "node": "Business Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Business Configuration": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Weekly Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Weekly Content": {
+      "main": [
+        [
+          {
+            "node": "Parse & Split Into Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Split Into Days": {
+      "main": [
+        [
+          {
+            "node": "Write to Content Calendar Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write to Content Calendar Sheet": {
+      "main": [
+        [
+          {
+            "node": "Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "zensta-template-002"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "name": "AI",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Social Media",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Content Marketing",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    }
+  ]
+}

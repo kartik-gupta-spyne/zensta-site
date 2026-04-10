@@ -1,0 +1,368 @@
+{
+  "name": "AI Lead Response Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-form",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook - Form Submission",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "lead-form-webhook",
+      "notes": "Receives incoming contact form submissions via POST request. Expected fields: name, email, phone (optional), message, source (optional). Connect your website form to this webhook URL."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-name",
+              "name": "leadName",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "set-email",
+              "name": "leadEmail",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "set-phone",
+              "name": "leadPhone",
+              "value": "={{ $json.body.phone || 'Not provided' }}",
+              "type": "string"
+            },
+            {
+              "id": "set-message",
+              "name": "leadMessage",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "set-source",
+              "name": "leadSource",
+              "value": "={{ $json.body.source || 'Website Contact Form' }}",
+              "type": "string"
+            },
+            {
+              "id": "set-timestamp",
+              "name": "receivedAt",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-fields",
+      "name": "Extract Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300],
+      "notes": "Extracts and normalizes the form fields into clean variables for downstream nodes. Edit the field mappings here if your form uses different field names."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-email",
+              "leftValue": "={{ $json.leadEmail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "check-name",
+              "leftValue": "={{ $json.leadName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "validate-input",
+      "name": "Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "notes": "Ensures both name and email are present before proceeding. Sends an error response back to the form if validation fails."
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "You are a friendly, professional business assistant responding to website contact form inquiries. Your company name is [YOUR COMPANY NAME]. Your tone should be warm, helpful, and concise.\n\nRules:\n- Always address the person by their first name\n- Acknowledge their specific question or message\n- Provide a helpful initial answer or let them know the right person will follow up\n- Include a clear next step or call-to-action\n- Keep the response under 150 words\n- Do NOT make up specific details about services/pricing you don't know\n- Sign off with a professional closing",
+              "role": "system"
+            },
+            {
+              "content": "A new lead just submitted a contact form. Please write a personalized email response.\n\nLead Name: {{ $json.leadName }}\nLead Email: {{ $json.leadEmail }}\nLead Phone: {{ $json.leadPhone }}\nSource: {{ $json.leadSource }}\n\nTheir message:\n\"{{ $json.leadMessage }}\"\n\nWrite a personalized email response. Return ONLY a JSON object with two keys: \"subject\" (email subject line) and \"body\" (the email body in plain text with line breaks).",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "id": "openai-generate",
+      "name": "AI Generate Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [900, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Generates a personalized email response using GPT-4o-mini. Edit the system prompt to match your company's voice and services. The model returns a JSON with subject and body fields."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "parse-response",
+              "name": "aiResponse",
+              "value": "={{ JSON.parse($json.message.content) }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1120, 200],
+      "notes": "Parses the JSON response from OpenAI into subject and body fields for the email node."
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Extract Lead Data').item.json.leadEmail }}",
+        "subject": "={{ $json.aiResponse.subject }}",
+        "message": "={{ $json.aiResponse.body }}",
+        "options": {
+          "replyTo": "your-email@example.com"
+        }
+      },
+      "id": "send-email",
+      "name": "Send Email Reply",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1340, 200],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      },
+      "notes": "Sends the AI-generated email to the lead. Configure your SMTP credentials (Gmail, SendGrid, Mailgun, etc.) in n8n credentials. Update the replyTo address to your business email."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Extract Lead Data').item.json.receivedAt }}",
+            "Name": "={{ $('Extract Lead Data').item.json.leadName }}",
+            "Email": "={{ $('Extract Lead Data').item.json.leadEmail }}",
+            "Phone": "={{ $('Extract Lead Data').item.json.leadPhone }}",
+            "Message": "={{ $('Extract Lead Data').item.json.leadMessage }}",
+            "Source": "={{ $('Extract Lead Data').item.json.leadSource }}",
+            "AI Response Subject": "={{ $json.aiResponse.subject }}",
+            "AI Response Sent": "=Yes",
+            "Status": "=New Lead"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "log-to-sheets",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1340, 420],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "notes": "Logs every lead to a Google Sheet for tracking and follow-up. Create a sheet with columns: Timestamp, Name, Email, Phone, Message, Source, AI Response Subject, AI Response Sent, Status. Replace the sheet URL with yours."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Thank you! We will be in touch shortly.' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-success",
+      "name": "Respond to Webhook - Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1560, 200],
+      "notes": "Returns a success response to the website form so the user sees a confirmation message."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, message: 'Please provide your name and email address.' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond to Webhook - Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 460],
+      "notes": "Returns an error response when required fields (name/email) are missing from the form submission."
+    }
+  ],
+  "connections": {
+    "Webhook - Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Extract Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook - Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Response": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Send Email Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Reply": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook - Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "zensta-template-001"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "name": "AI",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Lead Generation",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Email Automation",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    }
+  ]
+}

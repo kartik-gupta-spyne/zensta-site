@@ -1,0 +1,446 @@
+{
+  "name": "Review Monitor & AI Responder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300],
+      "notes": "Checks for new reviews every 6 hours (at midnight, 6am, noon, 6pm). Adjust the cron expression to check more or less frequently."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-place-id",
+              "name": "googlePlaceId",
+              "value": "REPLACE_WITH_YOUR_GOOGLE_PLACE_ID",
+              "type": "string"
+            },
+            {
+              "id": "set-business-name",
+              "name": "businessName",
+              "value": "[YOUR BUSINESS NAME]",
+              "type": "string"
+            },
+            {
+              "id": "set-owner-email",
+              "name": "ownerEmail",
+              "value": "owner@example.com",
+              "type": "string"
+            },
+            {
+              "id": "set-api-key",
+              "name": "googleApiKey",
+              "value": "REPLACE_WITH_YOUR_GOOGLE_PLACES_API_KEY",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-settings",
+      "name": "Business Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300],
+      "notes": "CONFIGURE THIS NODE: Enter your Google Place ID (find it at https://developers.google.com/maps/documentation/places/web-service/place-id), business name, owner email, and Google Places API key."
+    },
+    {
+      "parameters": {
+        "url": "=https://maps.googleapis.com/maps/api/place/details/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "place_id",
+              "value": "={{ $json.googlePlaceId }}"
+            },
+            {
+              "name": "fields",
+              "value": "reviews,name,rating"
+            },
+            {
+              "name": "key",
+              "value": "={{ $json.googleApiKey }}"
+            },
+            {
+              "name": "reviews_sort",
+              "value": "newest"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-reviews",
+      "name": "Fetch Google Reviews",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "notes": "Fetches the latest reviews from Google Places API. The API returns the 5 most recent reviews. We filter for new ones in the next node."
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst reviews = response.result?.reviews || [];\nconst businessName = $('Business Configuration').first().json.businessName;\nconst ownerEmail = $('Business Configuration').first().json.ownerEmail;\n\n// Get the static data to track which reviews we've already processed\nconst staticData = $getWorkflowStaticData('global');\nconst processedReviews = staticData.processedReviews || [];\n\n// Filter to only new reviews we haven't seen\nconst newReviews = reviews.filter(review => {\n  // Create a unique ID from author + time\n  const reviewId = `${review.author_name}_${review.time}`;\n  return !processedReviews.includes(reviewId);\n});\n\n// Mark all current reviews as processed\nconst allReviewIds = reviews.map(r => `${r.author_name}_${r.time}`);\nstaticData.processedReviews = allReviewIds;\n\nif (newReviews.length === 0) {\n  // Return empty to stop the workflow\n  return [];\n}\n\n// Return each new review as a separate item\nreturn newReviews.map(review => ({\n  json: {\n    authorName: review.author_name,\n    rating: review.rating,\n    text: review.text || '(No text)',\n    relativeTime: review.relative_time_description,\n    time: review.time,\n    profilePhoto: review.profile_photo_url || '',\n    sentiment: review.rating >= 4 ? 'positive' : review.rating === 3 ? 'neutral' : 'negative',\n    businessName: businessName,\n    ownerEmail: ownerEmail\n  }\n}));"
+      },
+      "id": "filter-new-reviews",
+      "name": "Filter New Reviews Only",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "notes": "Uses n8n static data to remember which reviews have already been processed. Only passes through genuinely new reviews. The workflow stops here if there are no new reviews (no unnecessary AI calls or notifications)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-negative",
+              "leftValue": "={{ $json.rating }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "route-by-sentiment",
+      "name": "Route by Sentiment",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "notes": "Routes reviews based on star rating. 1-3 stars go to the 'needs careful response' path (true). 4-5 stars go to the 'positive response' path (false). This ensures negative reviews get more empathetic, careful responses."
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "You are a business owner responding to a NEGATIVE or NEUTRAL customer review. Your business is {{ $json.businessName }}.\n\nRules:\n- Be empathetic and acknowledge their concern\n- Never be defensive or dismissive\n- Apologize for their experience\n- Offer to make it right (invite them to contact you directly)\n- Keep it under 100 words\n- Be genuine, not corporate-sounding\n- Never argue with the reviewer\n- Include your first name as the sign-off (use 'The {{ $json.businessName }} Team' if preferred)",
+              "role": "system"
+            },
+            {
+              "content": "Write a response to this {{ $json.rating }}-star review from {{ $json.authorName }}:\n\n\"{{ $json.text }}\"\n\nReturn ONLY a JSON object: {\"response\": \"your response text\", \"urgency\": \"high\" or \"medium\", \"actionNeeded\": \"brief description of any follow-up needed\"}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.6,
+          "maxTokens": 300
+        }
+      },
+      "id": "ai-negative-response",
+      "name": "AI - Empathetic Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [1340, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Generates a careful, empathetic response for negative/neutral reviews (1-3 stars). Uses lower temperature (0.6) for more consistent, measured responses."
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "You are a business owner responding to a POSITIVE customer review. Your business is {{ $json.businessName }}.\n\nRules:\n- Thank them warmly and specifically\n- Reference something specific from their review\n- Express genuine appreciation\n- Keep it under 80 words\n- Be warm and personal, not generic\n- Invite them back or mention something they might enjoy next time\n- Vary your responses - don't start every response with 'Thank you so much'",
+              "role": "system"
+            },
+            {
+              "content": "Write a response to this {{ $json.rating }}-star review from {{ $json.authorName }}:\n\n\"{{ $json.text }}\"\n\nReturn ONLY a JSON object: {\"response\": \"your response text\", \"urgency\": \"low\", \"actionNeeded\": \"none\"}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 250
+        }
+      },
+      "id": "ai-positive-response",
+      "name": "AI - Grateful Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [1340, 440],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Generates a warm, grateful response for positive reviews (4-5 stars). Uses higher temperature (0.8) for more varied, natural-sounding responses."
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst reviewData = $('Filter New Reviews Only').first().json;\nlet parsed;\n\ntry {\n  parsed = JSON.parse(item.message.content);\n} catch (e) {\n  const match = item.message.content.match(/\\{[\\s\\S]*\\}/);\n  parsed = match ? JSON.parse(match[0]) : { response: item.message.content, urgency: 'medium', actionNeeded: 'Review AI response' };\n}\n\nreturn [{\n  json: {\n    ...reviewData,\n    suggestedResponse: parsed.response,\n    urgency: parsed.urgency,\n    actionNeeded: parsed.actionNeeded\n  }\n}];"
+      },
+      "id": "merge-negative",
+      "name": "Format Negative Review Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 200],
+      "notes": "Combines the original review data with the AI-generated response for negative reviews."
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst reviewData = $('Filter New Reviews Only').first().json;\nlet parsed;\n\ntry {\n  parsed = JSON.parse(item.message.content);\n} catch (e) {\n  const match = item.message.content.match(/\\{[\\s\\S]*\\}/);\n  parsed = match ? JSON.parse(match[0]) : { response: item.message.content, urgency: 'low', actionNeeded: 'none' };\n}\n\nreturn [{\n  json: {\n    ...reviewData,\n    suggestedResponse: parsed.response,\n    urgency: parsed.urgency,\n    actionNeeded: parsed.actionNeeded\n  }\n}];"
+      },
+      "id": "merge-positive",
+      "name": "Format Positive Review Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 440],
+      "notes": "Combines the original review data with the AI-generated response for positive reviews."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Reviews"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toISO() }}",
+            "Reviewer": "={{ $json.authorName }}",
+            "Rating": "={{ $json.rating }}",
+            "Sentiment": "={{ $json.sentiment }}",
+            "Review Text": "={{ $json.text }}",
+            "Suggested Response": "={{ $json.suggestedResponse }}",
+            "Urgency": "={{ $json.urgency }}",
+            "Action Needed": "={{ $json.actionNeeded }}",
+            "Response Posted": "=No - Pending Review"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "log-to-sheets",
+      "name": "Log Review & Response to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1780, 320],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "notes": "Logs every review and its suggested AI response to a tracking sheet. Create a sheet named 'Reviews' with columns: Date, Reviewer, Rating, Sentiment, Review Text, Suggested Response, Urgency, Action Needed, Response Posted."
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.ownerEmail }}",
+        "subject": "={{ $json.sentiment === 'negative' ? '🚨 URGENT' : $json.sentiment === 'neutral' ? '⚠️ Attention' : '⭐ Great' }}: New {{ $json.rating }}-Star Review from {{ $json.authorName }}",
+        "message": "=New Google Review Alert for {{ $json.businessName }}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nReviewer: {{ $json.authorName }}\nRating: {{ '⭐'.repeat($json.rating) }} ({{ $json.rating }}/5)\nSentiment: {{ $json.sentiment.toUpperCase() }}\nPosted: {{ $json.relativeTime }}\n\n━━━ REVIEW ━━━\n{{ $json.text }}\n\n━━━ SUGGESTED RESPONSE (AI-Generated) ━━━\n{{ $json.suggestedResponse }}\n\n━━━ RECOMMENDED ACTION ━━━\nUrgency: {{ $json.urgency.toUpperCase() }}\nAction: {{ $json.actionNeeded }}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTo respond: Copy the suggested response above (edit as needed) and post it as a reply on Google Maps.\n\nThis response has been logged to your review tracking sheet for your records.",
+        "options": {}
+      },
+      "id": "send-notification",
+      "name": "Email Alert to Owner",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2000, 320],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      },
+      "notes": "Sends an email notification to the business owner with the review details and suggested AI response. Urgent subject line for negative reviews, calm subject for positive ones. The owner can copy/paste the response directly to Google Maps."
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "Business Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Business Configuration": {
+      "main": [
+        [
+          {
+            "node": "Fetch Google Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Google Reviews": {
+      "main": [
+        [
+          {
+            "node": "Filter New Reviews Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Reviews Only": {
+      "main": [
+        [
+          {
+            "node": "Route by Sentiment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Sentiment": {
+      "main": [
+        [
+          {
+            "node": "AI - Empathetic Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI - Grateful Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Empathetic Response": {
+      "main": [
+        [
+          {
+            "node": "Format Negative Review Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Grateful Response": {
+      "main": [
+        [
+          {
+            "node": "Format Positive Review Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Negative Review Data": {
+      "main": [
+        [
+          {
+            "node": "Log Review & Response to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Positive Review Data": {
+      "main": [
+        [
+          {
+            "node": "Log Review & Response to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Review & Response to Sheet": {
+      "main": [
+        [
+          {
+            "node": "Email Alert to Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "global": {
+      "processedReviews": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "zensta-template-003"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "name": "AI",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Reviews",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    },
+    {
+      "name": "Google Business",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "updatedAt": "2026-04-10T00:00:00.000Z"
+    }
+  ]
+}
