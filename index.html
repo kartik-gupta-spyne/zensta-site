@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zensta — AI Automation for Small Businesses</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #4361ee;
+            --accent-hover: #3a56d4;
+            --text: #2d2d2d;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-alt: #f8f9fb;
+            --border: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg);
+        }
+
+        .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+        /* Nav */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+        .nav-cta {
+            background: var(--accent);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .nav-cta:hover { background: var(--accent-hover); }
+
+        /* Hero */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            line-height: 1.2;
+            color: var(--primary);
+            margin-bottom: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 560px;
+            margin: 0 auto 32px;
+        }
+        .hero-cta {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .hero-cta:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .hero-sub {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Problem */
+        .problem {
+            padding: 60px 0;
+            background: var(--bg-alt);
+        }
+        .problem h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .problem-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+        }
+        .problem-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .problem-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .problem-card .cost {
+            margin-top: 12px;
+            font-weight: 700;
+            color: #dc2626;
+            font-size: 1.1rem;
+        }
+
+        /* Solution */
+        .solution {
+            padding: 60px 0;
+        }
+        .solution h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .solution .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-size: 1.05rem;
+        }
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .solution-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            transition: border-color 0.2s;
+        }
+        .solution-card:hover { border-color: var(--accent); }
+        .solution-card .icon { font-size: 2rem; margin-bottom: 12px; }
+        .solution-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--primary); }
+        .solution-card p { color: var(--text-light); font-size: 0.95rem; margin-bottom: 12px; }
+        .solution-card .price {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.15rem;
+        }
+
+        /* How it works */
+        .process {
+            padding: 60px 0;
+            background: var(--bg-alt);
+        }
+        .process h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 32px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .step {
+            text-align: center;
+        }
+        .step-num {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+        .step h3 { font-size: 1rem; margin-bottom: 6px; color: var(--primary); }
+        .step p { color: var(--text-light); font-size: 0.9rem; }
+
+        /* Pricing */
+        .pricing {
+            padding: 60px 0;
+        }
+        .pricing h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .pricing-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 36px;
+            text-align: center;
+        }
+        .pricing-card.featured {
+            border-color: var(--accent);
+            position: relative;
+        }
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .pricing-card h3 { font-size: 1.2rem; color: var(--primary); margin-bottom: 8px; }
+        .pricing-card .amount { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
+        .pricing-card .amount span { font-size: 1rem; font-weight: 400; color: var(--text-light); }
+        .pricing-card .desc { color: var(--text-light); margin: 12px 0 20px; font-size: 0.95rem; }
+        .pricing-card ul {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        .pricing-card ul li {
+            padding: 6px 0;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .pricing-card ul li::before {
+            content: '\2713';
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .pricing-cta {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .pricing-cta:hover { background: var(--accent-hover); }
+
+        /* CTA */
+        .final-cta {
+            padding: 80px 0;
+            background: var(--primary);
+            text-align: center;
+            color: white;
+        }
+        .final-cta h2 { font-size: 2rem; margin-bottom: 12px; }
+        .final-cta p { color: #9ca3af; margin-bottom: 32px; font-size: 1.1rem; }
+        .final-cta a {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+        .final-cta a:hover { background: var(--accent-hover); }
+
+        /* Footer */
+        footer {
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 48px 0 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="#" class="logo">zen<span>sta</span></a>
+        <a href="#pricing" class="nav-cta">Get Started</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <h1>Your business answers calls, books appointments, and chats with customers — while you sleep</h1>
+        <p>AI-powered chatbots and voice agents that handle your front desk 24/7. Set up in days, not months. No contracts.</p>
+        <a href="#pricing" class="hero-cta">See Pricing</a>
+        <p class="hero-sub">Setup in 3-5 business days. Cancel anytime.</p>
+    </div>
+</section>
+
+<section class="problem">
+    <div class="container">
+        <h2>What's costing you customers right now</h2>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <h3>Missed calls = missed revenue</h3>
+                <p>62% of calls to small businesses go unanswered. Each missed call to a dental practice is worth $200-500 in lost treatment.</p>
+                <p class="cost">$3,000-8,000/mo lost</p>
+            </div>
+            <div class="problem-card">
+                <h3>Receptionist costs keep climbing</h3>
+                <p>A full-time receptionist costs $2,500-4,000/month plus benefits, PTO, training, and turnover.</p>
+                <p class="cost">$36,000-55,000/year</p>
+            </div>
+            <div class="problem-card">
+                <h3>After-hours = dead zone</h3>
+                <p>Customers search at 9 PM but your office closed at 5. They move on to the competitor who responds instantly.</p>
+                <p class="cost">40% of inquiries come after hours</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="solution">
+    <div class="container">
+        <h2>AI agents that work your front desk 24/7</h2>
+        <p class="subtitle">Pick what fits your business. Mix and match.</p>
+        <div class="solution-grid">
+            <div class="solution-card">
+                <div class="icon">💬</div>
+                <h3>Website Chat Agent</h3>
+                <p>Answers customer questions, captures leads, books appointments directly from your website. Trained on your business.</p>
+                <p class="price">From $149/mo</p>
+            </div>
+            <div class="solution-card">
+                <div class="icon">📞</div>
+                <h3>AI Phone Agent</h3>
+                <p>Handles incoming calls with a natural voice. Books appointments, answers FAQs, routes urgent calls to you.</p>
+                <p class="price">From $299/mo</p>
+            </div>
+            <div class="solution-card">
+                <div class="icon">⚡</div>
+                <h3>Workflow Automation</h3>
+                <p>Connect your tools — auto-send follow-ups, sync bookings to your calendar, update your CRM. Zero manual work.</p>
+                <p class="price">From $199/mo</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="process">
+    <div class="container">
+        <h2>Live in 3 steps</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h3>Tell us about your business</h3>
+                <p>Share your FAQs, services, booking process. Takes 15 minutes.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h3>We build & train your agent</h3>
+                <p>Custom AI agent configured for your business. Ready in 3-5 days.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h3>Go live & watch it work</h3>
+                <p>Embed on your site or forward your phone line. Starts handling customers immediately.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pricing" id="pricing">
+    <div class="container">
+        <h2>Simple pricing. No surprises.</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Starter</h3>
+                <div class="amount">$149<span>/mo</span></div>
+                <p class="desc">Website chat agent for small businesses</p>
+                <ul>
+                    <li>AI chatbot on your website</li>
+                    <li>Trained on your business info</li>
+                    <li>Lead capture & email alerts</li>
+                    <li>Appointment booking</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="mailto:hello@zensta.work?subject=Interested in Starter Plan" class="pricing-cta">Get Started</a>
+            </div>
+            <div class="pricing-card featured">
+                <h3>Professional</h3>
+                <div class="amount">$349<span>/mo</span></div>
+                <p class="desc">Chat + phone agent for growing businesses</p>
+                <ul>
+                    <li>Everything in Starter</li>
+                    <li>AI phone agent (incoming calls)</li>
+                    <li>Calendar & CRM integration</li>
+                    <li>Automated follow-up sequences</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="mailto:hello@zensta.work?subject=Interested in Professional Plan" class="pricing-cta">Get Started</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Custom</h3>
+                <div class="amount">$599<span>/mo</span></div>
+                <p class="desc">Full automation suite, tailored to you</p>
+                <ul>
+                    <li>Everything in Professional</li>
+                    <li>Custom workflow automations</li>
+                    <li>Multi-location support</li>
+                    <li>Advanced analytics dashboard</li>
+                    <li>Dedicated account manager</li>
+                </ul>
+                <a href="mailto:hello@zensta.work?subject=Interested in Custom Plan" class="pricing-cta">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="final-cta">
+    <div class="container">
+        <h2>Stop losing customers to your voicemail</h2>
+        <p>Get a 24/7 AI agent for your business. Setup in days, not months.</p>
+        <a href="mailto:hello@zensta.work?subject=I want an AI agent for my business">Start Free Consultation</a>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 Zensta. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
