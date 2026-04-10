@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Real Estate Assistant Demo — Zensta</title>
+    <style>
+        :root {
+            --primary: #0f1b2d;
+            --accent: #b8860b;
+            --accent-hover: #a07608;
+            --accent-light: #fdf8eb;
+            --text: #2d2d2d;
+            --text-light: #6b7280;
+            --text-muted: #9ca3af;
+            --bg: #ffffff;
+            --bg-alt: #f7f8fa;
+            --bg-chat: #f3f4f6;
+            --border: #e5e7eb;
+            --green: #10b981;
+            --green-light: #ecfdf5;
+            --navy: #1b2a4a;
+            --navy-light: #243556;
+            --gold: #c9952d;
+            --gold-light: #e8c663;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg-alt);
+            min-height: 100vh;
+        }
+
+        /* Top bar */
+        .top-bar {
+            background: var(--primary);
+            color: white;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+        }
+        .top-bar a {
+            color: var(--gold-light);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .top-bar a:hover { text-decoration: underline; }
+
+        /* Header */
+        .demo-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 28px 0;
+        }
+        .demo-header .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .logo span { color: var(--accent); }
+
+        .demo-header h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .demo-header p {
+            color: var(--text-light);
+            font-size: 1rem;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* Chat container */
+        .chat-wrapper {
+            max-width: 520px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        .chat-window {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 580px;
+        }
+
+        /* Chat header (real estate branding) */
+        .chat-head {
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px solid var(--accent);
+        }
+        .chat-head-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(184,134,11,0.25);
+            border: 2px solid var(--gold-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .chat-head-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 1px;
+            letter-spacing: 0.01em;
+        }
+        .chat-head-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.78rem;
+            opacity: 0.9;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Messages area */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            scroll-behavior: smooth;
+        }
+        .chat-messages::-webkit-scrollbar { width: 5px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+        /* Message bubbles */
+        .msg-row {
+            display: flex;
+            gap: 8px;
+            max-width: 88%;
+            animation: msgIn 0.3s ease-out;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg-row.bot { align-self: flex-start; }
+        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .msg-row.user .msg-avatar {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .msg-row.bot .msg-bubble {
+            background: var(--bg-chat);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+        .msg-row.user .msg-bubble {
+            background: var(--navy);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            padding-left: 38px;
+        }
+        .msg-row.user + .msg-time { text-align: right; padding-right: 38px; padding-left: 0; }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            max-width: 88%;
+        }
+        .typing-indicator .msg-avatar {
+            width: 30px;
+            height: 30px;
+        }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: var(--bg-chat);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+        }
+        .typing-dots span {
+            width: 7px;
+            height: 7px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typingBounce 1.2s ease-in-out infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Suggested questions */
+        .suggestions {
+            padding: 0 16px 6px 16px;
+        }
+        .suggestions-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .suggestion-chip {
+            padding: 7px 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .suggestion-chip:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Input area */
+        .chat-input-area {
+            padding: 12px 16px 16px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .chat-input {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 24px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+            resize: none;
+            max-height: 80px;
+            line-height: 1.4;
+        }
+        .chat-input:focus { border-color: var(--accent); }
+        .chat-input::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .send-btn:hover { background: var(--accent-hover); }
+        .send-btn:disabled { background: #d1d5db; cursor: default; }
+        .send-btn svg { width: 18px; height: 18px; fill: white; }
+
+        /* CTA section */
+        .cta-section {
+            max-width: 520px;
+            margin: 0 auto 40px;
+            padding: 0 16px;
+        }
+        .cta-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 32px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .cta-card h3 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .cta-card p {
+            color: var(--text-light);
+            font-size: 0.92rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 13px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: background 0.15s;
+        }
+        .cta-btn:hover { background: var(--accent-hover); }
+        .cta-features {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .cta-feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: var(--text-light);
+        }
+        .cta-feature svg { width: 16px; height: 16px; color: var(--green); flex-shrink: 0; }
+
+        /* Footer */
+        .demo-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .demo-footer a { color: var(--accent); text-decoration: none; }
+        .demo-footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 560px) {
+            .demo-header h1 { font-size: 1.3rem; }
+            .chat-window { height: 520px; }
+            .cta-features { flex-direction: column; align-items: center; gap: 10px; }
+            .chat-head { padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        Powered by <a href="https://zensta.work">Zensta</a> &mdash; AI automation for small businesses
+    </div>
+
+    <header class="demo-header">
+        <div class="container">
+            <a href="https://zensta.work" class="logo">zen<span>sta</span></a>
+            <h1>See how Zensta's AI assistant handles your client inquiries 24/7</h1>
+            <p>This is a live demo. Try asking anything a buyer or seller would ask &mdash; listings, viewings, mortgage info, market conditions, or selling process.</p>
+        </div>
+    </header>
+
+    <div class="chat-wrapper">
+        <div class="chat-window">
+            <!-- Chat header: looks like a real brokerage widget -->
+            <div class="chat-head">
+                <div class="chat-head-avatar">&#x1F3E0;</div>
+                <div class="chat-head-info">
+                    <h3>Summit Realty Group</h3>
+                    <div class="chat-head-status">
+                        <span class="status-dot"></span>
+                        AI Assistant &middot; Online now
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Initial greeting injected by JS -->
+            </div>
+
+            <!-- Suggestions -->
+            <div class="suggestions" id="suggestionsArea">
+                <div class="suggestions-label">Try asking</div>
+                <div class="suggestion-chips" id="suggestionChips">
+                    <!-- Chips injected by JS -->
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="chat-input-row">
+                    <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn" aria-label="Send message">
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <div class="cta-card">
+            <h3>Want this for your brokerage?</h3>
+            <p>We set up a custom AI assistant trained on your listings, agents, service areas, and processes &mdash; ready to handle buyer and seller inquiries 24/7.</p>
+            <a href="mailto:mira@zensta.work?subject=AI%20Assistant%20for%20my%20brokerage&body=Hi%20Mira%2C%0A%0AI%20just%20tried%20the%20demo%20and%20I%27m%20interested%20in%20learning%20more%20about%20an%20AI%20assistant%20for%20my%20brokerage.%0A%0ABrokerage%20name%3A%20%0ALocation%3A%20%0AWebsite%3A%20%0A%0AThanks!" class="cta-btn">Get started &mdash; email mira@zensta.work</a>
+            <div class="cta-features">
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Setup in 48 hours
+                </div>
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    No contracts
+                </div>
+                <div class="cta-feature">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    24/7 availability
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        &copy; 2026 <a href="https://zensta.work">Zensta</a>. AI-powered automation for small businesses.
+    </div>
+
+<script>
+(function() {
+    // =====================================================================
+    // KNOWLEDGE BASE — real estate brokerage responses
+    // =====================================================================
+    const BROKERAGE = {
+        name: "Summit Realty Group",
+        address: "2800 Pearl Street, Suite 110, Boulder, CO 80301",
+        phone: "(303) 555-0247",
+        hours: {
+            "Monday":    "9:00 AM – 6:00 PM",
+            "Tuesday":   "9:00 AM – 6:00 PM",
+            "Wednesday": "9:00 AM – 6:00 PM",
+            "Thursday":  "9:00 AM – 7:00 PM",
+            "Friday":    "9:00 AM – 6:00 PM",
+            "Saturday":  "10:00 AM – 4:00 PM",
+            "Sunday":    "12:00 PM – 4:00 PM (open houses only)"
+        }
+    };
+
+    // Suggested questions (shown as chips)
+    const SUGGESTIONS = [
+        "Show me listings",
+        "Schedule a viewing",
+        "Mortgage calculator",
+        "I want to sell my home",
+        "Neighborhood info",
+        "Talk to an agent"
+    ];
+
+    // Response patterns — each entry: { patterns: [...], responses: [...] }
+    const KB = [
+        // Listings / properties / homes for sale
+        {
+            patterns: [/\b(listing|listings|homes? for sale|properties|available|what's on the market|houses|condos|townhome|show me|browse|search)\b/i],
+            responses: [
+                `Great timing! Here are some of our featured listings:\n\n**1. 742 Oakwood Drive, Boulder** — $685,000\n4 bed / 3 bath | 2,450 sq ft | Built 2018\nStunning mountain views, open floor plan, finished basement. Walkable to Foothills Park.\n\n**2. 1519 Spruce Street, Louisville** — $529,000\n3 bed / 2 bath | 1,850 sq ft | Corner lot\nCharming updated ranch with modern kitchen, hardwood floors, large backyard with mature trees.\n\n**3. 305 Canyon Blvd #402, Boulder** — $425,000\n2 bed / 2 bath | 1,200 sq ft | Condo\nDowntown living! Top-floor unit with rooftop deck access, in-unit laundry, 1 parking spot. Walk to Pearl Street.\n\n**4. 8901 Baseline Road, Lafayette** — $749,900\n5 bed / 3.5 bath | 3,100 sq ft | 0.35 acre lot\nSpacious family home with home office, 3-car garage, pool, and views of the Flatirons.\n\nWould you like to schedule a viewing for any of these? I can also search for something more specific if you tell me your **budget**, **preferred area**, and **must-haves**.`,
+                `We have some wonderful properties right now! Here are a few highlights:\n\n**$425,000** — 2BR/2BA condo on Canyon Blvd, downtown Boulder. Perfect for professionals or investors.\n\n**$529,000** — 3BR/2BA ranch in Louisville. Recently updated, big backyard, quiet neighborhood.\n\n**$685,000** — 4BR/3BA in Boulder with mountain views and a finished basement. Move-in ready.\n\n**$749,900** — 5BR/3.5BA family home in Lafayette with a pool and Flatirons views.\n\nWant me to filter by **price range**, **bedrooms**, **neighborhood**, or **property type**? I can also set up automatic alerts so you're notified the moment new listings match your criteria.`
+            ]
+        },
+        // Schedule viewing / tour / visit / showing
+        {
+            patterns: [/\b(view|viewing|tour|showing|visit|see (the|a|this) (house|home|property|place|condo)|walk\s*through|open house|come see|look at)\b/i],
+            responses: [
+                `I'd love to set up a showing for you! To get that scheduled, I just need a few details:\n\n1. **Which property** are you interested in? (address or listing number)\n2. **Preferred date and time?** We have availability this week including evenings and weekends.\n3. **Your name and phone number** so our agent can confirm\n\nOur agents are also available for **virtual tours** via video call if that's more convenient.\n\nWe also have **open houses** this weekend:\n- **Saturday 1-3 PM** — 742 Oakwood Drive, Boulder\n- **Sunday 12-3 PM** — 8901 Baseline Road, Lafayette\n\nFeel free to drop in — no appointment needed for open houses!`,
+                `Absolutely! We can get you in for a private showing. We typically have availability within 24-48 hours.\n\nJust let me know:\n- The **property address** you'd like to see\n- A couple of **dates/times** that work for you\n- Whether you'd prefer **in-person** or a **virtual video tour**\n\nIf you're not sure which property yet, I can also arrange a **neighborhood tour** where our agent shows you 3-4 homes in your target area in a single visit. It's a great way to compare options.\n\nShall I set something up?`
+            ]
+        },
+        // Mortgage / financing / pre-approval / loan
+        {
+            patterns: [/\b(mortgage|financing|finance|pre.?approv|loan|interest rate|down payment|monthly payment|afford|qualify|lender|FHA|VA|conventional)\b/i],
+            responses: [
+                `Great question about financing! Here's a quick overview:\n\n**Current Estimated Rates** (as of this week):\n- 30-year fixed: ~6.75%\n- 15-year fixed: ~6.10%\n- FHA loans: ~6.25%\n\n**Quick Mortgage Estimate:**\nFor a $500,000 home with 20% down ($100,000):\n- Monthly payment: ~$2,594 (principal + interest)\n- Add ~$350/mo for taxes + insurance\n- **Total: ~$2,944/month**\n\n**Getting Pre-Approved:**\nWe strongly recommend getting pre-approved before house hunting. It:\n- Shows sellers you're a serious buyer\n- Helps you know your true budget\n- Can speed up closing by 1-2 weeks\n\nWe partner with several trusted local lenders who can get you pre-approved in as little as **24 hours**. Want me to connect you with one of them? No obligation, and they'll walk you through all your options.`,
+                `Let me break down the mortgage basics for you:\n\n**Down Payment Options:**\n- Conventional: 5-20% down\n- FHA: as low as 3.5% down\n- VA: 0% down (if you qualify)\n- First-time buyer programs available in Colorado\n\n**Example Monthly Payments** (30-yr fixed at ~6.75%):\n- $400K home, 20% down: ~$2,075/mo\n- $500K home, 20% down: ~$2,594/mo\n- $700K home, 20% down: ~$3,632/mo\n*(Principal + interest only; add taxes & insurance)*\n\n**Pro tip:** Your total monthly housing cost (mortgage + taxes + insurance) should ideally be under **28-30% of your gross monthly income**.\n\nWant me to connect you with one of our preferred lenders for a **free pre-approval**? It only takes about 15 minutes and doesn't affect your credit score for the initial check.`
+            ]
+        },
+        // Sell my home / selling / list my home
+        {
+            patterns: [/\b(sell|selling|list my|listing agent|what's my home worth|home value|market value|CMA|comparative|how much is my home|sell.*house|put.*on market)\b/i],
+            responses: [
+                `Thinking about selling? You've come to the right place! Here's how we help:\n\n**Step 1: Free Home Valuation**\nWe'll provide a Comparative Market Analysis (CMA) based on recent sales in your area. This tells you exactly what your home is worth in today's market.\n\n**Step 2: Prep & Staging**\nOur team advises on improvements that maximize your sale price. We also offer professional photography, virtual tours, and staging consultation.\n\n**Step 3: Strategic Marketing**\nYour listing goes on MLS, Zillow, Realtor.com, social media, email blasts to our buyer network, and targeted digital ads.\n\n**Step 4: Offers & Negotiation**\nOur agents are expert negotiators. We handle all offers, counteroffers, and contingencies to get you the best price.\n\n**Step 5: Close with Confidence**\nWe coordinate inspections, appraisals, title work, and closing — so you don't have to worry about a thing.\n\n**Current market insight:** Boulder County homes are averaging **12 days on market** and selling at **98.5% of asking price**.\n\nWant to get started with a **free, no-obligation home valuation**? Just share your address and I'll have one of our listing specialists reach out.`,
+                `Great decision to explore selling! The Boulder County market is strong right now.\n\n**Quick Market Snapshot:**\n- Median home price: $625,000 (up 4.2% year-over-year)\n- Average days on market: 12 days\n- Homes selling at 98.5% of list price\n- Low inventory = strong seller's market\n\n**What We Offer Sellers:**\n- **Free CMA** (Comparative Market Analysis) to price your home right\n- **Professional photography & 3D virtual tours** included\n- **Full-service marketing** across 50+ platforms\n- **Commission:** competitive rates, discussed during consultation\n\nThe first step is a **free home valuation**. Would you like to share your property address so we can pull comps and give you a realistic price range? No strings attached.`
+            ]
+        },
+        // Neighborhood / area / schools / community
+        {
+            patterns: [/\b(neighborhood|area|school|schools|district|communit|safe|crime|walkab|near|nearby|restaurant|shop|amenity|amenities|park|recreation|family.?friendly)\b/i],
+            responses: [
+                `Great question! Here's a quick overview of our most popular neighborhoods:\n\n**Downtown Boulder (Pearl Street area)**\nWalkability: 9/10 | Median: $550K-$800K\nVibrant dining & shopping, close to CU campus, great for young professionals. Excellent public transit.\n\n**South Boulder / Table Mesa**\nSchools: 9/10 | Median: $700K-$950K\nTop-rated BVSD schools, family-friendly, access to hiking trails, NCAR. Quiet and residential.\n\n**Louisville**\nValue: 8/10 | Median: $475K-$650K\nHistoric downtown with great restaurants, highly rated schools, strong community feel. More affordable than Boulder proper.\n\n**Lafayette**\nGrowing: 8/10 | Median: $500K-$700K\nRapid development, new amenities, good schools, easy access to US-36 for Denver commuters.\n\n**School Districts:**\n- Boulder Valley School District (BVSD) — rated A+\n- Top elementary: Crest View, Flatirons, Mesa\n- Top high schools: Fairview, Monarch, Boulder High\n\nWant detailed info on a specific neighborhood? I can share school ratings, walkability scores, average commute times, and recent sale prices.`,
+                `I'd be happy to share neighborhood insights! What matters most to you? Here are some factors I can help with:\n\n- **Schools** — ratings, districts, proximity\n- **Safety** — crime statistics, community feel\n- **Commute** — distance to Denver, Boulder, or a specific workplace\n- **Lifestyle** — walkability, dining, parks, nightlife, outdoor recreation\n- **Investment** — price trends, appreciation rates, rental demand\n\n**Popular family neighborhoods:** South Boulder, Louisville, Superior\n**Best for professionals:** Downtown Boulder, Gunbarrel, North Boulder\n**Best value:** Lafayette, Longmont, Frederick\n\nTell me a bit about what you're looking for — family size, budget, must-haves — and I'll recommend the best-fit neighborhoods for you.`
+            ]
+        },
+        // Agent / talk to someone / contact
+        {
+            patterns: [/\b(agent|realtor|broker|talk to|speak to|speak with|contact|call|someone|representative|person|reach|human)\b/i],
+            responses: [
+                `Of course! Our agents would love to connect with you.\n\n**Ways to reach us:**\n- **Phone:** ${BROKERAGE.phone} (Mon-Sat during office hours)\n- **Email:** info@summitrealty.com\n- **In person:** ${BROKERAGE.address}\n\n**Our team specializes in:**\n- **Sarah Mitchell** — Buyer specialist, downtown Boulder & surrounding areas\n- **David Chen** — Luxury properties & new construction\n- **Maria Rodriguez** — First-time homebuyers & relocation\n- **James Park** — Investment properties & rentals\n\nI can have the right agent reach out to you directly. Just share your **name**, **phone or email**, and whether you're **buying, selling, or both** — and someone will be in touch within the hour during business hours.\n\nOr feel free to call us at **${BROKERAGE.phone}** anytime!`,
+                `I'd be happy to connect you with one of our agents! To match you with the best person, it helps to know:\n\n1. Are you looking to **buy**, **sell**, or **both**?\n2. What **area** are you interested in?\n3. What's the best way to reach you — **phone** or **email**?\n\nOur office hours are:\n**Mon-Fri:** 9 AM – 6 PM (Thu until 7 PM)\n**Saturday:** 10 AM – 4 PM\n**Sunday:** 12 – 4 PM (open houses)\n\nYou can also call us directly at **${BROKERAGE.phone}** — someone is always available during office hours. We typically respond to messages within **30 minutes** during business hours.`
+            ]
+        },
+        // Market conditions / market update / trends
+        {
+            patterns: [/\b(market|condition|trend|forecast|outlook|inventory|demand|supply|bubble|crash|good time|right time|should I buy|should I sell|appreciation|value.*going)\b/i],
+            responses: [
+                `Here's the latest Boulder County market snapshot:\n\n**Market Conditions (Q1 2026):**\n- Median sale price: **$625,000** (+4.2% YoY)\n- Average days on market: **12 days**\n- Inventory: **1.8 months of supply** (seller's market)\n- Sale-to-list ratio: **98.5%**\n- New listings: up 8% from last quarter\n\n**What This Means:**\n- **For buyers:** Competition is moderate. Homes priced right sell fast, but there's slightly more inventory than last year. Getting pre-approved and being ready to move quickly is key.\n- **For sellers:** Demand is still strong. Well-priced, well-presented homes are getting multiple offers. Now is a great time to list.\n\n**Key Trends:**\n- Remote work continues to drive demand in Boulder\n- New construction picking up in Lafayette and Superior\n- Condo market strengthening as affordability pushes buyers toward attached homes\n\nWant a detailed analysis for a specific neighborhood or price range? I can pull the latest data for you.`
+            ]
+        },
+        // Open house / open houses
+        {
+            patterns: [/\b(open house|open houses|weekend.*show|come look|drop.?in|walk.?in)\b/i],
+            responses: [
+                `We have open houses every weekend! Here's what's coming up:\n\n**This Saturday, April 12th:**\n- **1:00 – 3:00 PM** | 742 Oakwood Drive, Boulder\n  4 bed / 3 bath | $685,000 — Mountain views, move-in ready\n- **11:00 AM – 1:00 PM** | 1519 Spruce Street, Louisville\n  3 bed / 2 bath | $529,000 — Updated ranch, big backyard\n\n**This Sunday, April 13th:**\n- **12:00 – 3:00 PM** | 8901 Baseline Road, Lafayette\n  5 bed / 3.5 bath | $749,900 — Pool, Flatirons views, 3-car garage\n- **1:00 – 3:00 PM** | 305 Canyon Blvd #402, Boulder\n  2 bed / 2 bath | $425,000 — Downtown condo, rooftop deck\n\nNo appointment needed — just drop in! Our agents will be on-site to answer questions and give you a full tour.\n\nWant me to send you a reminder before any of these?`
+            ]
+        },
+        // Buying process / steps / first-time buyer / how to buy
+        {
+            patterns: [/\b(buying process|steps|how to buy|first.?time|process|start|begin|new to|guide|what do I need|checklist)\b/i],
+            responses: [
+                `Here's a clear roadmap for the home buying process:\n\n**Step 1: Get Pre-Approved (1-2 days)**\nKnow your budget before you shop. We'll connect you with a trusted lender.\n\n**Step 2: Define Your Criteria**\nBedrooms, location, budget, must-haves vs. nice-to-haves. We'll set up a custom property search.\n\n**Step 3: Tour Homes**\nWe'll schedule viewings based on your preferences. Most buyers tour 5-10 homes.\n\n**Step 4: Make an Offer**\nOur agent will help you write a competitive offer with the right terms and contingencies.\n\n**Step 5: Under Contract (30-45 days)**\n- Home inspection (within 7-10 days)\n- Appraisal (ordered by lender)\n- Title search & insurance\n- Final loan approval\n\n**Step 6: Closing Day!**\nSign the papers, get your keys, move in. We'll be there every step of the way.\n\n**Typical Timeline:** 45-60 days from first tour to keys in hand.\n\n**First-time buyers:** Ask us about Colorado down payment assistance programs — you may qualify for up to $25,000 in assistance.\n\nReady to get started? The best first step is getting pre-approved. Want me to set that up?`
+            ]
+        },
+        // Closing costs / fees / closing
+        {
+            patterns: [/\b(closing cost|closing fee|closing|fees|cost to buy|cost to sell|commission|how much does it cost|title|escrow|transfer tax)\b/i],
+            responses: [
+                `Great question about closing costs! Here's what to expect:\n\n**For Buyers (typically 2-5% of purchase price):**\n\nOn a $500,000 home, expect roughly $10,000 - $25,000:\n- Loan origination fee: ~$1,500\n- Appraisal: $500 - $700\n- Home inspection: $400 - $600\n- Title insurance: ~$1,200\n- Escrow/closing fees: ~$800\n- Prepaid taxes & insurance: $2,000 - $4,000\n- Recording fees: ~$100\n- HOA transfer fees (if applicable): $200 - $500\n\n**For Sellers (typically 7-9% of sale price):**\n- Agent commission: 5-6% (split between buyer's and seller's agents)\n- Title insurance: ~$1,000\n- Transfer taxes: varies by county\n- Closing/escrow fees: ~$800\n- Outstanding liens, prorated taxes, HOA dues\n\n**Good news:** Some closing costs are negotiable, and sellers sometimes offer to cover a portion of buyer's closing costs as an incentive.\n\nWant a personalized closing cost estimate for a specific property or price point? I can run the numbers for you.`
+            ]
+        },
+        // Investment / rental / income property
+        {
+            patterns: [/\b(invest|investment|rental|income property|ROI|return|cash flow|flip|Airbnb|short.?term rental|STR|landlord|tenant|cap rate)\b/i],
+            responses: [
+                `Investment properties are a great opportunity in this market! Here's what you should know:\n\n**Boulder County Investment Overview:**\n- Average rental yield: 4.5-6.5% (long-term)\n- Short-term rental (STR) regulations vary by city — Boulder has strict STR rules, but Lafayette and unincorporated areas are more flexible\n- Strong rental demand from CU students, tech workers, and relocating professionals\n\n**Popular Investment Strategies:**\n- **House hacking:** Buy a multi-unit or home with ADU, live in one unit, rent the others\n- **Long-term rental:** Steady cash flow, strong appreciation in Boulder County\n- **Fix & flip:** Margins have tightened but still viable in the right neighborhoods\n\n**Financing for Investors:**\n- Conventional: 20-25% down for investment properties\n- DSCR loans: qualification based on rental income, not personal income\n- Portfolio loans: for experienced investors with multiple properties\n\nOur agent **James Park** specializes in investment properties and can help you analyze deals. Want me to connect you with him?`
+            ]
+        },
+        // Greeting / hello
+        {
+            patterns: [/^(hi|hello|hey|good morning|good afternoon|good evening|howdy|hola|sup|yo|what's up)\b/i],
+            responses: [
+                `Hi there! Welcome to ${BROKERAGE.name}. I'm your AI assistant — available 24/7 to help with all things real estate.\n\nI can help you with:\n- **Property listings** in Boulder County\n- **Scheduling viewings** and open houses\n- **Mortgage estimates** and pre-approval\n- **Selling your home** — valuations and process\n- **Neighborhood info** and school ratings\n\nHow can I help you today?`,
+                `Hello! Thanks for reaching out to ${BROKERAGE.name}. Whether you're buying, selling, or just exploring — I'm here to help!\n\nWhat are you interested in today?`
+            ]
+        },
+        // Thanks / bye
+        {
+            patterns: [/\b(thank|thanks|thx|bye|goodbye|see you|take care|appreciate|that's all|that's it)\b/i],
+            responses: [
+                `You're welcome! If you need anything else as you navigate your real estate journey, don't hesitate to reach out. We're always here to help.\n\nHave a wonderful day!`,
+                `Happy to help! Whether you're ready to move forward or just exploring, we're here whenever you need us.\n\nBest of luck with your home search — talk soon!`
+            ]
+        },
+        // Hours / office hours
+        {
+            patterns: [/\b(hours|open|close|when are you|what time|operating|office|weekend)\b/i],
+            responses: [
+                `Here are our office hours:\n\n**Mon – Wed, Fri:** 9:00 AM – 6:00 PM\n**Thursday:** 9:00 AM – 7:00 PM\n**Saturday:** 10:00 AM – 4:00 PM\n**Sunday:** 12:00 PM – 4:00 PM (open houses)\n\nWe're located at **${BROKERAGE.address}** — right on Pearl Street with visitor parking available.\n\nOf course, I'm available here **24/7** to answer questions, and our agents are often reachable evenings and weekends by phone at **${BROKERAGE.phone}**.\n\nWould you like to schedule a time to come in?`,
+                `Our office is open **7 days a week**:\n\n**Weekdays:** 9 AM – 6 PM (Thursdays until 7 PM for evening consultations)\n**Saturday:** 10 AM – 4 PM\n**Sunday:** 12 – 4 PM\n\nNeed to meet outside those hours? Our agents are flexible — just let us know and we'll make it work.\n\nYou can also call us anytime at **${BROKERAGE.phone}**. How can I help?`
+            ]
+        },
+        // Location / directions / address / where
+        {
+            patterns: [/\b(location|address|where|directions|parking|find you|located|map|office)\b/i],
+            responses: [
+                `We're conveniently located on Pearl Street:\n\n**${BROKERAGE.address}**\n\nWe're in the Pearl Street Professional Building, just east of 28th Street. Look for the Summit Realty Group sign on the first floor.\n\n**Parking:** Free visitor parking available in the lot behind the building. Street parking is also available on Pearl Street (metered).\n\n**From Denver:** Take US-36 W to the Foothills Parkway exit, then head north to Pearl Street. About 35 minutes from downtown Denver.\n\nNeed help finding us? Call us at **${BROKERAGE.phone}** and we'll guide you in!`
+            ]
+        },
+        // Relocation / moving
+        {
+            patterns: [/\b(relocat|moving to|move to|transfer|new to the area|just moved|coming from|out of state)\b/i],
+            responses: [
+                `Welcome to Boulder! Relocating can be exciting and overwhelming — we're here to make it seamless.\n\n**Our Relocation Services:**\n- **Virtual home tours** so you can house-hunt before you arrive\n- **Neighborhood guides** tailored to your lifestyle and needs\n- **School information** if you have children\n- **Local connections** — movers, contractors, utilities, everything you need\n- **Agent Maria Rodriguez** specializes in relocation and knows exactly how to help out-of-state buyers\n\n**Quick Boulder Facts:**\n- Population: ~105,000\n- Known for: outdoor recreation, tech industry, CU Boulder\n- Climate: 300+ days of sunshine, mild winters\n- Major employers: Google, Ball Aerospace, CU, NCAR, numerous startups\n\nWhere are you moving from, and what's your timeline? I can set up a personalized search and connect you with Maria to make your move smooth.`
+            ]
+        },
+        // Cancellation / reschedule
+        {
+            patterns: [/\b(cancel|reschedule|change|move|postpone|can't make it|won't make it)\b/i],
+            responses: [
+                `No problem at all! Life happens.\n\nWould you like to:\n1. **Reschedule** to a different date/time?\n2. **Cancel** and rebook when you're ready?\n\nJust let me know your name and the appointment details, and I'll get it sorted right away. Or you can call us at **${BROKERAGE.phone}**.\n\nWe're flexible — our agents are available most days including evenings and weekends.`
+            ]
+        },
+        // Home inspection / appraisal
+        {
+            patterns: [/\b(inspection|inspect|apprais|condition|structural|foundation|roof|HVAC|plumbing|electric|radon)\b/i],
+            responses: [
+                `Great question! Here's what to know about inspections and appraisals:\n\n**Home Inspection ($400-$600):**\nDone within 7-10 days of going under contract. A licensed inspector checks:\n- Structural integrity & foundation\n- Roof condition & age\n- HVAC, plumbing, and electrical systems\n- Radon levels (very important in Colorado!)\n- Water heater, appliances, windows\n\nIf issues are found, we can negotiate repairs or credits with the seller.\n\n**Appraisal ($500-$700):**\nOrdered by your lender to confirm the home's value supports the loan amount. This is required for most mortgages.\n\n**Colorado-Specific Note:** Radon testing is strongly recommended here. About 50% of homes in Boulder County have elevated radon levels, but it's easily mitigated ($800-$1,500 for a mitigation system).\n\nWe can recommend trusted, experienced inspectors in the area. Want those referrals?`
+            ]
+        }
+    ];
+
+    // Fallback for unmatched queries
+    const FALLBACK_RESPONSES = [
+        `That's a great question! For the most detailed answer, I'd recommend speaking with one of our agents. You can reach us at **${BROKERAGE.phone}** or I can have someone follow up with you.\n\nIn the meantime, is there anything else I can help with — like listings, scheduling a viewing, or market info?`,
+        `I want to make sure I give you the right information on that. Let me connect you with our team — call us at **${BROKERAGE.phone}** during office hours, or I can have an agent get back to you.\n\nIs there anything else I can help with right now?`,
+        `Good question! That's something one of our agents would be best equipped to answer. Would you like to schedule a consultation? We can get you in this week.\n\nOr feel free to call us at **${BROKERAGE.phone}** for a quick answer.`
+    ];
+
+    // =====================================================================
+    // CHAT ENGINE
+    // =====================================================================
+
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const suggestionsArea = document.getElementById('suggestionsArea');
+    const suggestionChips = document.getElementById('suggestionChips');
+
+    let isTyping = false;
+
+    // Format bold/markdown-ish text
+    function formatText(text) {
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n/g, '<br>');
+        return text;
+    }
+
+    // Add a message to chat
+    function addMessage(text, sender) {
+        const row = document.createElement('div');
+        row.className = `msg-row ${sender}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'msg-avatar';
+        avatar.textContent = sender === 'bot' ? '\u{1F3E0}' : 'You';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.innerHTML = formatText(text);
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+
+    // Show typing indicator
+    function showTyping() {
+        isTyping = true;
+        const el = document.createElement('div');
+        el.className = 'typing-indicator';
+        el.id = 'typingIndicator';
+        el.innerHTML = `
+            <div class="msg-avatar" style="background: linear-gradient(135deg, #1b2a4a, #243556); color: white; font-size: 0.75rem;">\u{1F3E0}</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+        `;
+        messagesEl.appendChild(el);
+        scrollToBottom();
+    }
+
+    // Hide typing indicator
+    function hideTyping() {
+        isTyping = false;
+        const el = document.getElementById('typingIndicator');
+        if (el) el.remove();
+    }
+
+    function scrollToBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    // Find the best matching response
+    function getResponse(input) {
+        const text = input.trim();
+        if (!text) return null;
+
+        for (const entry of KB) {
+            for (const pattern of entry.patterns) {
+                if (pattern.test(text)) {
+                    const responses = entry.responses;
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+            }
+        }
+
+        return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)];
+    }
+
+    // Handle sending a message
+    function sendMessage(text) {
+        if (isTyping) return;
+        const msg = (text || inputEl.value).trim();
+        if (!msg) return;
+
+        addMessage(msg, 'user');
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        updateSendBtn();
+
+        suggestionsArea.style.display = 'none';
+
+        const delay = 600 + Math.random() * 800;
+        showTyping();
+
+        setTimeout(() => {
+            hideTyping();
+            const response = getResponse(msg);
+            addMessage(response, 'bot');
+
+            if (Math.random() > 0.5) {
+                showFollowUpSuggestions(msg);
+            }
+        }, delay);
+    }
+
+    // Show contextual follow-up suggestion chips
+    function showFollowUpSuggestions(lastMsg) {
+        const followUps = [];
+        const lower = lastMsg.toLowerCase();
+
+        if (/listing|homes? for sale|properties|available/i.test(lower)) {
+            followUps.push("Schedule a viewing", "Mortgage calculator");
+        } else if (/view|viewing|tour|showing|open house/i.test(lower)) {
+            followUps.push("Show me listings", "What are the hours?");
+        } else if (/mortgage|financ|pre.?approv|loan/i.test(lower)) {
+            followUps.push("Show me listings", "Talk to an agent");
+        } else if (/sell|selling|list my|home worth/i.test(lower)) {
+            followUps.push("Market conditions", "Talk to an agent");
+        } else if (/neighborhood|area|school/i.test(lower)) {
+            followUps.push("Show me listings", "Schedule a viewing");
+        } else if (/agent|contact|talk/i.test(lower)) {
+            followUps.push("Show me listings", "What are your hours?");
+        } else if (/market|condition|trend/i.test(lower)) {
+            followUps.push("Show me listings", "I want to sell my home");
+        } else if (/closing|cost|fee/i.test(lower)) {
+            followUps.push("Mortgage calculator", "Talk to an agent");
+        } else if (/invest|rental|income/i.test(lower)) {
+            followUps.push("Show me listings", "Market conditions");
+        } else {
+            followUps.push("Show me listings", "Talk to an agent");
+        }
+
+        if (followUps.length > 0) {
+            setTimeout(() => {
+                suggestionsArea.style.display = 'block';
+                const label = suggestionsArea.querySelector('.suggestions-label');
+                if (label) label.textContent = 'You might also ask';
+                renderChips(followUps);
+            }, 300);
+        }
+    }
+
+    // Render suggestion chips
+    function renderChips(items) {
+        suggestionChips.innerHTML = '';
+        items.forEach(text => {
+            const chip = document.createElement('button');
+            chip.className = 'suggestion-chip';
+            chip.textContent = text;
+            chip.addEventListener('click', () => sendMessage(text));
+            suggestionChips.appendChild(chip);
+        });
+    }
+
+    // Update send button state
+    function updateSendBtn() {
+        sendBtn.disabled = !inputEl.value.trim();
+    }
+
+    // Auto-resize textarea
+    function autoResize() {
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 80) + 'px';
+    }
+
+    // =====================================================================
+    // INIT
+    // =====================================================================
+
+    renderChips(SUGGESTIONS);
+
+    setTimeout(() => {
+        addMessage(
+            `Hi there! Welcome to ${BROKERAGE.name}. I'm your AI assistant — available 24/7 to help with all things real estate.\n\nI can help you with:\n- **Browsing listings** in Boulder County\n- **Scheduling viewings** and open houses\n- **Mortgage estimates** and pre-approval\n- **Selling your home** — valuations and process\n- **Neighborhood info** and school ratings\n- **Connecting you** with the right agent\n\nWhat can I help you with today?`,
+            'bot'
+        );
+    }, 400);
+
+    inputEl.addEventListener('input', () => {
+        updateSendBtn();
+        autoResize();
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    sendBtn.addEventListener('click', () => sendMessage());
+
+    updateSendBtn();
+})();
+</script>
+
+</body>
+</html>

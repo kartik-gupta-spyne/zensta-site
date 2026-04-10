@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NameForge AI — AI Business Name Generator | Free</title>
+    <meta name="description" content="Generate creative business names instantly with AI. Free tool — get 10 unique name suggestions with taglines and domain availability in seconds.">
+    <style>
+        :root {
+            --bg-deep: #0b0a1a;
+            --bg-card: #13122a;
+            --bg-card-hover: #1a1940;
+            --accent: #7c3aed;
+            --accent-light: #a78bfa;
+            --accent-glow: rgba(124, 58, 237, 0.3);
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #4f46e5, #6d28d9);
+            --text: #f1f0ff;
+            --text-muted: #9894b8;
+            --text-dim: #6b6590;
+            --border: rgba(124, 58, 237, 0.15);
+            --border-active: rgba(124, 58, 237, 0.4);
+            --green: #34d399;
+            --green-bg: rgba(52, 211, 153, 0.1);
+            --red: #f87171;
+            --red-bg: rgba(248, 113, 113, 0.1);
+            --yellow: #fbbf24;
+            --yellow-bg: rgba(251, 191, 36, 0.1);
+            --radius: 12px;
+            --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* === BACKGROUND EFFECTS === */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(79, 70, 229, 0.06) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* === NAV === */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 10, 26, 0.8);
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* === HERO === */
+        .hero {
+            text-align: center;
+            padding: 80px 0 48px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--accent-light);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* === TOOL SECTION === */
+        .tool-section {
+            padding: 0 0 40px;
+        }
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+            opacity: 0.4;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        textarea, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        textarea:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        textarea::placeholder {
+            color: var(--text-dim);
+        }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239894b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+        select option {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 600px) {
+            .input-row { grid-template-columns: 1fr; }
+        }
+
+        /* Style selector chips */
+        .style-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .style-chip {
+            padding: 8px 18px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .style-chip:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+        .style-chip.active {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* Generate button */
+        .btn-generate {
+            width: 100%;
+            padding: 16px 32px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.01em;
+        }
+        .btn-generate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-generate:hover::before {
+            left: 100%;
+        }
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-generate:disabled:hover::before {
+            left: -100%;
+        }
+
+        .gen-counter {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 12px;
+        }
+        .gen-counter strong {
+            color: var(--accent-light);
+        }
+
+        /* === RESULTS === */
+        .results-area {
+            margin-top: 32px;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .results-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .results-count {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .name-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.3s ease;
+        }
+        .name-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .name-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-active);
+        }
+        .name-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .name-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: -0.01em;
+        }
+        .name-tagline {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .domain-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 100px;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+            flex-shrink: 0;
+        }
+        .domain-available {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+        .domain-taken {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(248, 113, 113, 0.15);
+        }
+        .domain-maybe {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+        }
+
+        /* Loading animation */
+        .loading-state {
+            text-align: center;
+            padding: 48px 0;
+        }
+        .loading-dots {
+            display: inline-flex;
+            gap: 6px;
+        }
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: bounce-dot 1.2s ease-in-out infinite;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce-dot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .loading-text {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* === PAYWALL OVERLAY === */
+        .paywall-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 10, 26, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .paywall-overlay.visible {
+            display: flex;
+        }
+        .paywall-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius-lg);
+            padding: 48px 40px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            animation: slide-up 0.4s ease;
+        }
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .paywall-card h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .paywall-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+        .paywall-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .paywall-price-note {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+        .paywall-features {
+            text-align: left;
+            margin-bottom: 28px;
+        }
+        .paywall-features li {
+            list-style: none;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .paywall-features li::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            background: var(--green-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%2334d399' viewBox='0 0 16 16'%3E%3Cpath d='M13.485 1.929a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 111.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .btn-upgrade {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 32px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .btn-upgrade:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+        .paywall-dismiss {
+            display: block;
+            margin-top: 14px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 4px;
+        }
+        .paywall-dismiss:hover {
+            color: var(--text-muted);
+        }
+
+        /* === PRICING SECTION === */
+        .pricing-section {
+            padding: 80px 0 60px;
+        }
+        .pricing-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        .pricing-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        @media (max-width: 600px) {
+            .pricing-grid { grid-template-columns: 1fr; }
+        }
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            position: relative;
+        }
+        .pricing-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+        .pricing-card.featured::before {
+            content: 'POPULAR';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 14px;
+            border-radius: 100px;
+            letter-spacing: 0.1em;
+        }
+        .pricing-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .pricing-amount {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .pricing-period {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+        .pricing-card ul {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+        .pricing-card ul li {
+            padding: 5px 0;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pricing-card ul li::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%2334d399' viewBox='0 0 16 16'%3E%3Cpath d='M13.485 1.929a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 111.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+        }
+        .pricing-btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .pricing-btn-outline:hover {
+            border-color: var(--accent);
+        }
+        .pricing-btn-fill {
+            background: var(--accent-gradient);
+            color: white;
+        }
+        .pricing-btn-fill:hover {
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+
+        /* === FOOTER === */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+        }
+        footer p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        footer a:hover {
+            color: var(--accent-light);
+        }
+
+        /* === MISC === */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .hero { padding: 56px 0 32px; }
+            .hero h1 { font-size: 2rem; }
+            .tool-card { padding: 24px 20px; }
+            .name-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .pricing-section { padding: 56px 0 40px; }
+            .paywall-card { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+    <div class="container">
+        <a href="/" class="logo">NameForge <span>AI</span></a>
+        <span class="nav-badge">Free Tool</span>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">AI-Powered Name Generator</div>
+        <h1>Find the perfect<br><span class="gradient-text">business name</span> in seconds</h1>
+        <p>Describe your business, pick a style, and get 10 unique name ideas with taglines and domain availability. Free. No signup.</p>
+    </div>
+</section>
+
+<!-- Tool -->
+<section class="tool-section">
+    <div class="container">
+        <div class="tool-card">
+
+            <div class="input-group">
+                <label for="description">What does your business do?</label>
+                <textarea id="description" placeholder="e.g. A cozy neighborhood coffee shop that also sells fresh-baked pastries and hosts local art events..." maxlength="300"></textarea>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="industry">Industry</label>
+                    <select id="industry">
+                        <option value="restaurant">Restaurant & Food</option>
+                        <option value="tech">Tech & Software</option>
+                        <option value="beauty">Beauty & Wellness</option>
+                        <option value="health">Health & Medical</option>
+                        <option value="realestate">Real Estate</option>
+                        <option value="consulting">Consulting & Services</option>
+                        <option value="ecommerce">E-commerce & Retail</option>
+                        <option value="creative">Creative & Design</option>
+                        <option value="fitness">Fitness & Sports</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Name Style</label>
+                    <div class="style-selector">
+                        <button class="style-chip active" data-style="modern">Modern</button>
+                        <button class="style-chip" data-style="classic">Classic</button>
+                        <button class="style-chip" data-style="playful">Playful</button>
+                        <button class="style-chip" data-style="bold">Bold</button>
+                        <button class="style-chip" data-style="minimal">Minimal</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-generate" id="generateBtn" onclick="handleGenerate()">Generate Names</button>
+            <div class="gen-counter" id="genCounter"></div>
+
+            <!-- Results -->
+            <div class="results-area" id="resultsArea" style="display:none;">
+                <div class="results-header">
+                    <h3>Your Name Ideas</h3>
+                    <span class="results-count" id="resultsCount"></span>
+                </div>
+                <div id="namesList"></div>
+                <button class="btn-generate" style="margin-top:16px" onclick="handleGenerate()">Generate More</button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading-state" id="loadingState" style="display:none;">
+                <div class="loading-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="loading-text">Crafting unique names for your business...</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Paywall overlay -->
+<div class="paywall-overlay" id="paywallOverlay">
+    <div class="paywall-card">
+        <h2>You're out of free generations</h2>
+        <p>You've used all 3 free generations. Upgrade to Pro for unlimited names and premium features.</p>
+        <div class="paywall-price">$4.99</div>
+        <div class="paywall-price-note">One-time payment. Lifetime access.</div>
+        <ul class="paywall-features">
+            <li>Unlimited name generations</li>
+            <li>Real-time .com domain checker</li>
+            <li>AI logo mockup for every name</li>
+            <li>Export results as PDF</li>
+            <li>Priority name style options</li>
+        </ul>
+        <a href="mailto:mira@zensta.work?subject=NameForge%20Pro%20Upgrade&body=I'd%20like%20to%20upgrade%20to%20NameForge%20Pro%20($4.99%20lifetime).%20Please%20send%20payment%20details." class="btn-upgrade">Upgrade to Pro</a>
+        <button class="paywall-dismiss" onclick="dismissPaywall()">Maybe later</button>
+    </div>
+</div>
+
+<!-- Pricing -->
+<section class="pricing-section" id="pricing">
+    <div class="container">
+        <h2>Simple pricing</h2>
+        <p class="pricing-subtitle">Start free. Upgrade when you need more.</p>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Free</h3>
+                <div class="pricing-amount">$0</div>
+                <div class="pricing-period">3 generations included</div>
+                <ul>
+                    <li>10 names per generation</li>
+                    <li>Tagline suggestions</li>
+                    <li>Domain availability hints</li>
+                    <li>All industries & styles</li>
+                </ul>
+                <button class="pricing-btn pricing-btn-outline" onclick="window.scrollTo({top:0,behavior:'smooth'})">Start Generating</button>
+            </div>
+            <div class="pricing-card featured">
+                <h3>Pro</h3>
+                <div class="pricing-amount">$4.99</div>
+                <div class="pricing-period">One-time. Lifetime access.</div>
+                <ul>
+                    <li>Unlimited generations</li>
+                    <li>Real-time domain checker</li>
+                    <li>AI logo mockups</li>
+                    <li>PDF export</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="mailto:mira@zensta.work?subject=NameForge%20Pro%20Upgrade&body=I'd%20like%20to%20upgrade%20to%20NameForge%20Pro%20($4.99%20lifetime).%20Please%20send%20payment%20details." class="pricing-btn pricing-btn-fill">Get Pro Access</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p>Built by <a href="https://zensta.work" target="_blank">Zensta</a> &middot; <a href="mailto:mira@zensta.work">Contact</a> &middot; <a href="https://zensta.work" target="_blank">More Tools</a></p>
+    </div>
+</footer>
+
+<script>
+/* ============================================================
+   NameForge AI — Client-side business name generator
+   No APIs. Pure combinatorial word-bank generation.
+   ============================================================ */
+
+// ---- Word Banks ----
+
+const WORD_BANKS = {
+    // ---- INDUSTRY ROOTS ----
+    industryRoots: {
+        restaurant: ['Savory','Harvest','Ember','Feast','Bistro','Cellar','Spice','Fork','Table','Vine','Morsel','Crumb','Kettle','Broth','Flame','Simmer','Platter','Toast','Drizzle','Bloom','Sage','Pepper','Truffle','Clove','Basil','Grill','Oven','Nourish','Graze','Garnish'],
+        tech: ['Sync','Nexus','Byte','Prism','Core','Logic','Flux','Nova','Grid','Helix','Apex','Cloud','Node','Stack','Pulse','Cipher','Vector','Orbit','Arc','Tensor','Qubit','Neuron','Pixel','Dash','Aether','Forge','Luma','Onyx','Vertex','Spark'],
+        beauty: ['Glow','Bloom','Aura','Silk','Petal','Lush','Radiant','Velvet','Dew','Bliss','Ivory','Satin','Nectar','Rose','Pearl','Ember','Flora','Grace','Luna','Shimmer','Orchid','Lavender','Crystal','Opal','Jade','Haven','Serene','Muse','Charm','Belle'],
+        health: ['Vital','Pulse','Care','Thrive','Medic','Wellspring','Restore','Clarity','Renew','Zenith','Heal','Nurture','Balance','Vigor','Core','Revive','Uplift','Harbor','Shield','Anchor','Summit','Fortify','Haven','Genesis','Elevate','Pinnacle','Bridge','Rise','Crest','Harmony'],
+        realestate: ['Keystone','Haven','Pinnacle','Threshold','Nest','Vista','Crest','Harbor','Crown','Legacy','Summit','Archer','Beacon','Gate','Meadow','Domain','Parcel','Stone','Ridge','Elm','Atlas','Manor','Sterling','Grove','Terra','Slate','Compass','Horizon','Aspen','Plaza'],
+        consulting: ['Apex','Catalyst','Vertex','Summit','Bridge','Insight','Compass','Forge','Vantage','Meridian','Aspect','Praxis','Axis','Helm','Beacon','Keystone','Fulcrum','Ascend','Pinnacle','Stratton','Zenith','Clarity','Matrix','Paradigm','Vector','Synergy','Horizon','Leverage','Accord','Salient'],
+        ecommerce: ['Cart','Market','Shelf','Box','Loop','Swift','Dash','Ship','Mint','Bazaar','Deal','Haul','Niche','Scout','Peak','Aisle','Curate','Stock','Fetch','Bundle','Thread','Crate','Trove','Stash','Snap','Orbit','Flair','Loot','Prime','Rally'],
+        creative: ['Studio','Canvas','Pixel','Inkwell','Prism','Muse','Atelier','Craft','Vision','Hue','Frame','Palette','Sketch','Bold','Imprint','Mosaic','Kinetic','Opus','Motif','Draft','Vivid','Verse','Echo','Luminary','Figment','Aesthetic','Focal','Spark','Tableau','Wavelength'],
+        fitness: ['Peak','Titan','Forge','Stride','Core','Apex','Pulse','Iron','Ignite','Summit','Elevate','Momentum','Beast','Grind','Rush','Flex','Rep','Blaze','Drive','Force','Power','Surge','Bolt','Sprint','Trail','Vigor','Edge','Lift','Rally','Venture'],
+        other: ['Nova','Spark','Axis','Venture','Bloom','Forge','Arc','Zen','Pinnacle','Prism','Bridge','Luma','Genesis','Scope','Orbit','Rise','Crest','Fuse','Aether','Peak','Signal','Radix','Helix','Core','Vertex','Atlas','Beacon','Echo','Nimbus','Haven']
+    },
+
+    // ---- STYLE MODIFIERS ----
+    stylePrefixes: {
+        modern: ['Neo','Hyper','Ultra','Omni','Meta','Zen','Aero','Alto','Flux','Shift'],
+        classic: ['Royal','Grand','Heritage','Noble','Sterling','Premier','Crown','Regent','Imperial','Victorian'],
+        playful: ['Fizz','Pop','Zippy','Breezy','Sunny','Happy','Jolly','Quirk','Snappy','Doodle'],
+        bold: ['Titan','Blaze','Storm','Apex','Thunder','Vanguard','Alpha','Quantum','Rampart','Goliath'],
+        minimal: ['One','Pure','Bare','True','Simply','Clear','Base','Dot','Line','Sol']
+    },
+
+    // ---- SUFFIXES ----
+    suffixes: {
+        modern: ['ly','ify','io','eo','ai','hub','lab','nest','base','shift'],
+        classic: ['& Co','Group','House','Works','Partners','Guild','Society','Collective','Firm','Trust'],
+        playful: ['zy','oo','pop','bot','boo','ful','ster','doo','bee','topia'],
+        bold: ['force','strike','works','corp','prime','max','edge','x','pro','elite'],
+        minimal: ['','co','so','to','do','go','nu','mu','la','ra']
+    },
+
+    // ---- TAGLINE TEMPLATES ----
+    taglineTemplates: {
+        restaurant: [
+            'Where every bite tells a story',
+            'Crafted with passion, served with love',
+            'Your table is waiting',
+            'Flavors that move you',
+            'Taste the difference',
+            'From our kitchen to your soul',
+            'Every dish, a masterpiece',
+            'Where food meets art'
+        ],
+        tech: [
+            'Building tomorrow, today',
+            'Technology that just works',
+            'Innovation without limits',
+            'Your digital advantage',
+            'Code meets craft',
+            'The future is now',
+            'Smarter solutions for a connected world',
+            'Where ideas become reality'
+        ],
+        beauty: [
+            'Reveal your natural glow',
+            'Beauty, redefined',
+            'Because you deserve to shine',
+            'Timeless elegance, modern touch',
+            'Your beauty journey starts here',
+            'Glow from within',
+            'Where beauty meets science',
+            'Radiance, simplified'
+        ],
+        health: [
+            'Your health, our mission',
+            'Care that makes a difference',
+            'Wellness starts here',
+            'Healing hands, caring hearts',
+            'Better health, better life',
+            'Because you matter',
+            'The path to wellness',
+            'Health reimagined'
+        ],
+        realestate: [
+            'Find your forever home',
+            'Where dreams find an address',
+            'Keys to your future',
+            'Home is just the beginning',
+            'Building communities, one home at a time',
+            'Your space, your story',
+            'Opening doors to new beginnings',
+            'Where you belong'
+        ],
+        consulting: [
+            'Strategy that delivers results',
+            'Your growth partner',
+            'Insight drives impact',
+            'Elevating businesses, one decision at a time',
+            'Where expertise meets execution',
+            'Clarity in complexity',
+            'Turning challenges into opportunities',
+            'The edge you need'
+        ],
+        ecommerce: [
+            'Shop smarter, live better',
+            'Everything you need, delivered',
+            'Discover what you love',
+            'Your one-stop destination',
+            'Curated for you',
+            'Click, love, repeat',
+            'Where quality meets convenience',
+            'The better way to shop'
+        ],
+        creative: [
+            'Where imagination takes form',
+            'Design that speaks volumes',
+            'Creating the extraordinary',
+            'Vision made visible',
+            'Art meets purpose',
+            'Bringing ideas to life',
+            'Creativity without boundaries',
+            'Design with intention'
+        ],
+        fitness: [
+            'Unleash your potential',
+            'Stronger every day',
+            'Your transformation starts now',
+            'Push limits, break barriers',
+            'Sweat. Grow. Repeat.',
+            'Elevate your performance',
+            'Built for those who dare',
+            'The grind never stops'
+        ],
+        other: [
+            'Built for what matters',
+            'The smarter way forward',
+            'Making it simple',
+            'Your journey starts here',
+            'Better by design',
+            'Progress, simplified',
+            'Where ambition meets action',
+            'Redefining what\'s possible'
+        ]
+    },
+
+    // ---- CONNECTORS for portmanteau ----
+    connectors: ['a','e','i','o','u','er','ar','ix','ex','ia','is','on','an','en']
+};
+
+// ---- Name Generation Engine ----
+
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function pickN(arr, n) {
+    return shuffleArray(arr).slice(0, n);
+}
+
+function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function extractKeywords(description) {
+    const stop = new Set(['a','an','the','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','that','this','these','those','it','its','my','our','your','their','we','they','i','me','us','you','he','she','him','her','who','what','where','when','how','why','not','no','so','also','very','just','about','up','out','if','then','than','more','some','any','each','every','all','both','few','most','other','into','over','after','before','between','under','again','further','once']);
+    const words = description.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stop.has(w));
+    return [...new Set(words)];
+}
+
+function makePortmanteau(word1, word2) {
+    const w1 = word1.toLowerCase();
+    const w2 = word2.toLowerCase();
+    // Take first part of word1 and last part of word2
+    const cut1 = Math.max(2, Math.ceil(w1.length * 0.6));
+    const cut2 = Math.max(2, Math.floor(w2.length * 0.5));
+    return capitalize(w1.slice(0, cut1) + w2.slice(w2.length - cut2));
+}
+
+function generateNames(description, industry, style) {
+    const roots = WORD_BANKS.industryRoots[industry] || WORD_BANKS.industryRoots.other;
+    const prefixes = WORD_BANKS.stylePrefixes[style] || WORD_BANKS.stylePrefixes.modern;
+    const suffixes = WORD_BANKS.suffixes[style] || WORD_BANKS.suffixes.modern;
+    const taglines = WORD_BANKS.taglineTemplates[industry] || WORD_BANKS.taglineTemplates.other;
+    const connectors = WORD_BANKS.connectors;
+    const keywords = extractKeywords(description);
+
+    const names = new Set();
+    const results = [];
+
+    function addName(name) {
+        const clean = name.replace(/\s+/g, ' ').trim();
+        if (clean.length < 3 || clean.length > 28) return false;
+        const key = clean.toLowerCase();
+        if (names.has(key)) return false;
+        names.add(key);
+        return clean;
+    }
+
+    // Pattern 1: [Root][Suffix] — e.g. "Syncify", "Bloomly"
+    const shuffledRoots = shuffleArray(roots);
+    const shuffledSuffixes = shuffleArray(suffixes);
+    for (let i = 0; i < 4; i++) {
+        const root = shuffledRoots[i % shuffledRoots.length];
+        const suffix = shuffledSuffixes[i % shuffledSuffixes.length];
+        const sep = suffix.startsWith('&') || suffix.startsWith(' ') ? ' ' : '';
+        const name = addName(root + sep + suffix);
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Pattern 2: [Prefix][Root] — e.g. "NeoSync", "ZenBloom"
+    const shuffledPrefixes = shuffleArray(prefixes);
+    for (let i = 0; i < 3; i++) {
+        const prefix = shuffledPrefixes[i % shuffledPrefixes.length];
+        const root = shuffledRoots[(i + 4) % shuffledRoots.length];
+        const name = addName(prefix + root);
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Pattern 3: Portmanteau from two roots — e.g. "Syncloud", "Pixelon"
+    for (let i = 0; i < 3; i++) {
+        const r1 = shuffledRoots[(i + 7) % shuffledRoots.length];
+        const r2 = shuffledRoots[(i + 10) % shuffledRoots.length];
+        const name = addName(makePortmanteau(r1, r2));
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Pattern 4: Keyword-infused — use words from description
+    if (keywords.length > 0) {
+        for (let i = 0; i < 3; i++) {
+            const kw = capitalize(pick(keywords));
+            const variant = Math.random();
+            let name;
+            if (variant < 0.33) {
+                name = addName(kw + pick(suffixes));
+            } else if (variant < 0.66) {
+                name = addName(pick(prefixes) + kw);
+            } else {
+                name = addName(makePortmanteau(kw, pick(roots)));
+            }
+            if (name) results.push({ name, tagline: pick(taglines) });
+        }
+    }
+
+    // Pattern 5: [Root] + connector + [Root fragment] — e.g. "Sparkion", "Bloomaris"
+    for (let i = 0; i < 3; i++) {
+        const root = shuffledRoots[(i + 13) % shuffledRoots.length];
+        const conn = pick(connectors);
+        const frag = shuffledRoots[(i + 16) % shuffledRoots.length].slice(0, 3).toLowerCase();
+        const name = addName(root + conn + frag);
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Pattern 6: Two-word names — "[Adj] [Noun]" style
+    const adjectives = shuffleArray([...prefixes, ...roots.slice(0, 5)]);
+    const nouns = shuffleArray(roots.slice(5));
+    for (let i = 0; i < 2; i++) {
+        const name = addName(adjectives[i % adjectives.length] + ' ' + nouns[i % nouns.length]);
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Ensure we have at least 10 results — fill gaps with more combos
+    let safety = 0;
+    while (results.length < 10 && safety < 50) {
+        safety++;
+        const pattern = Math.floor(Math.random() * 4);
+        let name;
+        if (pattern === 0) {
+            name = addName(pick(roots) + pick(suffixes));
+        } else if (pattern === 1) {
+            name = addName(pick(prefixes) + pick(roots));
+        } else if (pattern === 2) {
+            name = addName(makePortmanteau(pick(roots), pick(roots)));
+        } else {
+            name = addName(pick(roots) + pick(connectors) + pick(roots).slice(0,3).toLowerCase());
+        }
+        if (name) results.push({ name, tagline: pick(taglines) });
+    }
+
+    // Simulate domain availability: 3–4 out of 10 "likely available"
+    const availableCount = 3 + Math.floor(Math.random() * 2); // 3 or 4
+    const availableIndices = new Set(pickN([...Array(results.length).keys()], availableCount));
+    const maybeIndex = Math.floor(Math.random() * results.length);
+
+    results.forEach((r, i) => {
+        const domainName = r.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com';
+        if (availableIndices.has(i)) {
+            r.domain = { name: domainName, status: 'available', label: 'Likely available' };
+        } else if (i === maybeIndex && !availableIndices.has(i)) {
+            r.domain = { name: domainName, status: 'maybe', label: 'Check availability' };
+        } else {
+            r.domain = { name: domainName, status: 'taken', label: 'Likely taken' };
+        }
+    });
+
+    return results.slice(0, 10);
+}
+
+// ---- UI Logic ----
+
+const GEN_LIMIT = 3;
+const STORAGE_KEY = 'nameforge_gen_count';
+
+function getGenCount() {
+    return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+}
+function setGenCount(n) {
+    localStorage.setItem(STORAGE_KEY, n.toString());
+}
+
+function updateCounter() {
+    const count = getGenCount();
+    const remaining = Math.max(0, GEN_LIMIT - count);
+    const el = document.getElementById('genCounter');
+    if (count === 0) {
+        el.textContent = '';
+    } else {
+        el.innerHTML = `<strong>${remaining}</strong> free generation${remaining !== 1 ? 's' : ''} remaining`;
+    }
+}
+
+function showPaywall() {
+    document.getElementById('paywallOverlay').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+
+function dismissPaywall() {
+    document.getElementById('paywallOverlay').classList.remove('visible');
+    document.body.style.overflow = '';
+}
+
+// Style chip selection
+document.querySelectorAll('.style-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+    });
+});
+
+function getSelectedStyle() {
+    const active = document.querySelector('.style-chip.active');
+    return active ? active.dataset.style : 'modern';
+}
+
+function renderResults(names) {
+    const list = document.getElementById('namesList');
+    list.innerHTML = '';
+
+    names.forEach((item, i) => {
+        const card = document.createElement('div');
+        card.className = 'name-card';
+
+        const domainClass = item.domain.status === 'available' ? 'domain-available' :
+                            item.domain.status === 'maybe' ? 'domain-maybe' : 'domain-taken';
+
+        card.innerHTML = `
+            <div class="name-info">
+                <div class="name-title">${item.name}</div>
+                <div class="name-tagline">${item.tagline}</div>
+            </div>
+            <span class="domain-badge ${domainClass}" title="${item.domain.name}">${item.domain.label}</span>
+        `;
+
+        list.appendChild(card);
+
+        // Stagger animation
+        setTimeout(() => {
+            card.classList.add('visible');
+        }, 80 * (i + 1));
+    });
+
+    document.getElementById('resultsCount').textContent = names.length + ' names generated';
+    document.getElementById('resultsArea').style.display = 'block';
+}
+
+function handleGenerate() {
+    const description = document.getElementById('description').value.trim();
+    if (!description) {
+        document.getElementById('description').focus();
+        document.getElementById('description').style.borderColor = '#f87171';
+        setTimeout(() => {
+            document.getElementById('description').style.borderColor = '';
+        }, 2000);
+        return;
+    }
+
+    // Check generation limit
+    const count = getGenCount();
+    if (count >= GEN_LIMIT) {
+        showPaywall();
+        return;
+    }
+
+    const industry = document.getElementById('industry').value;
+    const style = getSelectedStyle();
+
+    // Show loading
+    document.getElementById('resultsArea').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('generateBtn').textContent = 'Generating...';
+
+    // Simulate brief processing delay for polish
+    const delay = 800 + Math.random() * 700;
+    setTimeout(() => {
+        const names = generateNames(description, industry, style);
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('generateBtn').disabled = false;
+        document.getElementById('generateBtn').textContent = 'Generate Names';
+
+        renderResults(names);
+
+        // Increment counter
+        setGenCount(count + 1);
+        updateCounter();
+
+        // Smooth scroll to results
+        document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, delay);
+}
+
+// Init
+updateCounter();
+</script>
+</body>
+</html>

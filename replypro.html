@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReplyPro — AI-Powered Google Review Reply Generator</title>
+<meta name="description" content="Generate perfect Google review replies in seconds. AI-crafted, professional responses for your business. Free to try.">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-200: #a7f3d0;
+  --emerald-300: #6ee7b7;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --emerald-800: #065f46;
+  --emerald-900: #064e3b;
+  --emerald-950: #022c22;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+@font-face {
+  font-family: 'System';
+  src: local('.SFNSText-Regular'), local('.HelveticaNeueDeskInterface-Regular'), local('.LucidaGrandeUI'), local('Segoe UI'), local('Ubuntu'), local('Roboto-Regular'), local('DroidSans');
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--gray-800);
+  background: #ffffff;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes starPop {
+  0% { transform: scale(0.5); opacity: 0.5; }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes copyFlash {
+  0% { background: var(--emerald-500); }
+  50% { background: var(--emerald-300); }
+  100% { background: var(--emerald-500); }
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes blink {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: var(--emerald-500); }
+}
+
+.animate-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.animate-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+nav.scrolled {
+  box-shadow: var(--shadow-md);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--gray-900);
+}
+.nav-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-700));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--emerald-600); }
+.nav-cta {
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: 140px 24px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--emerald-50) 0%, #ffffff 100%);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(5, 150, 105, 0.06) 0%, transparent 50%);
+  animation: gradientShift 15s ease infinite;
+  background-size: 200% 200%;
+}
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid var(--emerald-200);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--emerald-700);
+  margin-bottom: 28px;
+  animation: fadeInUp 0.6s ease;
+  box-shadow: var(--shadow-sm);
+}
+.hero-badge-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--emerald-500);
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+.hero h1 {
+  font-size: clamp(2.5rem, 5.5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--gray-950);
+  margin-bottom: 20px;
+  animation: fadeInUp 0.6s ease 0.1s both;
+  letter-spacing: -0.03em;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-700));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 1.2rem;
+  color: var(--gray-500);
+  max-width: 580px;
+  margin: 0 auto 36px;
+  animation: fadeInUp 0.6s ease 0.2s both;
+  line-height: 1.7;
+}
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s ease 0.3s both;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+.btn-secondary {
+  background: white;
+  color: var(--gray-700);
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--gray-200);
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  border-color: var(--emerald-300);
+  color: var(--emerald-600);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== SOCIAL PROOF BAR ===== */
+.social-proof {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 48px;
+  animation: fadeInUp 0.6s ease 0.4s both;
+  flex-wrap: wrap;
+}
+.social-proof-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+.social-proof-item svg {
+  color: var(--emerald-500);
+}
+.social-proof-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--gray-200);
+}
+
+/* ===== HOW IT WORKS ===== */
+.how-it-works {
+  padding: 100px 24px;
+  background: white;
+}
+.section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 60px;
+}
+.section-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--emerald-600);
+  margin-bottom: 12px;
+}
+.section-header h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.section-header p {
+  font-size: 1.1rem;
+  color: var(--gray-500);
+  line-height: 1.7;
+}
+.steps-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  position: relative;
+}
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 14%;
+  right: 14%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--emerald-200), var(--emerald-400), var(--emerald-200));
+  z-index: 0;
+}
+.step-card {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+}
+.step-number {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+.step-icon {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+.step-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+.step-card p {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+/* ===== TOOL SECTION ===== */
+.tool-section {
+  padding: 80px 24px 100px;
+  background: linear-gradient(180deg, var(--gray-50) 0%, white 100%);
+  position: relative;
+}
+.tool-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--emerald-200), transparent);
+}
+.tool-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.tool-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--gray-100);
+  overflow: hidden;
+  position: relative;
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--emerald-400), var(--emerald-600), var(--emerald-400));
+}
+.tool-header {
+  padding: 32px 36px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tool-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tool-title-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--emerald-100), var(--emerald-200));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.replies-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--emerald-700);
+}
+.replies-counter.depleted {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+.replies-counter-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald-500);
+}
+.replies-counter.depleted .replies-counter-dot {
+  background: #dc2626;
+}
+.tool-body {
+  padding: 28px 36px 36px;
+}
+.form-group {
+  margin-bottom: 24px;
+}
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 8px;
+}
+.form-label span {
+  font-weight: 400;
+  color: var(--gray-400);
+  font-size: 0.85rem;
+}
+textarea {
+  width: 100%;
+  min-height: 130px;
+  padding: 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.6;
+  color: var(--gray-800);
+  resize: vertical;
+  transition: all 0.2s ease;
+  background: var(--gray-50);
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--emerald-400);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+textarea::placeholder {
+  color: var(--gray-400);
+}
+
+/* Star rating */
+.star-rating {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.2s ease;
+  font-size: 0;
+  line-height: 0;
+}
+.star-btn:hover {
+  transform: scale(1.2);
+}
+.star-btn.active svg {
+  animation: starPop 0.3s ease;
+}
+.star-btn svg {
+  width: 32px;
+  height: 32px;
+  transition: all 0.2s ease;
+}
+.star-btn .star-filled {
+  display: none;
+  color: #facc15;
+  filter: drop-shadow(0 1px 2px rgba(250, 204, 21, 0.4));
+}
+.star-btn .star-empty {
+  color: var(--gray-300);
+}
+.star-btn.active .star-filled { display: block; }
+.star-btn.active .star-empty { display: none; }
+.star-rating-label {
+  margin-left: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  transition: color 0.2s;
+}
+
+/* Tone selector */
+.tone-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tone-option {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px 18px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: var(--gray-50);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  position: relative;
+}
+.tone-option:hover {
+  border-color: var(--emerald-300);
+  background: white;
+}
+.tone-option.selected {
+  border-color: var(--emerald-500);
+  background: var(--emerald-50);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+.tone-option-icon {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+.tone-option-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+.tone-option.selected .tone-option-label {
+  color: var(--emerald-700);
+}
+.tone-option-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--emerald-500);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.tone-option.selected .tone-option-check {
+  display: flex;
+}
+
+/* Business name input */
+.business-name-group {
+  margin-bottom: 24px;
+}
+.business-name-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--gray-800);
+  transition: all 0.2s ease;
+  background: var(--gray-50);
+}
+.business-name-input:focus {
+  outline: none;
+  border-color: var(--emerald-400);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Generate button */
+.generate-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+.generate-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.generate-btn.loading {
+  pointer-events: none;
+}
+.generate-btn.loading .btn-text { opacity: 0; }
+.generate-btn.loading .btn-loader { display: flex; }
+.btn-loader {
+  display: none;
+  position: absolute;
+  align-items: center;
+  gap: 6px;
+}
+.btn-loader-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1s ease infinite;
+}
+.btn-loader-dot:nth-child(2) { animation-delay: 0.15s; }
+.btn-loader-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* Output area */
+.output-section {
+  display: none;
+  margin-top: 28px;
+  animation: fadeInUp 0.5s ease;
+}
+.output-section.visible {
+  display: block;
+}
+.output-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gray-200), transparent);
+  margin-bottom: 28px;
+}
+.output-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reply-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.reply-card:hover {
+  border-color: var(--emerald-300);
+  box-shadow: var(--shadow-md);
+}
+.reply-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.reply-option-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--emerald-600);
+  background: var(--emerald-50);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.copy-btn:hover {
+  border-color: var(--emerald-400);
+  color: var(--emerald-600);
+  background: var(--emerald-50);
+}
+.copy-btn.copied {
+  background: var(--emerald-500);
+  border-color: var(--emerald-500);
+  color: white;
+}
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.reply-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--gray-700);
+  white-space: pre-wrap;
+}
+
+/* Error/info messages */
+.tool-message {
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+.tool-message.visible {
+  display: flex;
+}
+.tool-message.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+.tool-message.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+}
+.tool-message.warning {
+  background: #fffbeb;
+  border: 1px solid #fed7aa;
+  color: #d97706;
+}
+
+/* ===== PRICING ===== */
+.pricing {
+  padding: 100px 24px;
+  background: white;
+}
+.pricing-grid {
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.pricing-card {
+  border-radius: var(--radius-xl);
+  padding: 36px;
+  border: 2px solid var(--gray-200);
+  background: white;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+.pricing-card.featured {
+  border-color: var(--emerald-400);
+  background: linear-gradient(180deg, var(--emerald-50) 0%, white 40%);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+.pricing-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white;
+  padding: 5px 18px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.pricing-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+.pricing-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.pricing-amount .currency {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+.pricing-amount .amount {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1;
+}
+.pricing-amount .period {
+  font-size: 1rem;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+.pricing-desc {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.pricing-features {
+  list-style: none;
+  margin-bottom: 28px;
+}
+.pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.pricing-features li svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.pricing-features .check {
+  color: var(--emerald-500);
+}
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+.pricing-btn-outline {
+  background: white;
+  color: var(--gray-700);
+  border: 2px solid var(--gray-200);
+}
+.pricing-btn-outline:hover {
+  border-color: var(--emerald-400);
+  color: var(--emerald-600);
+}
+.pricing-btn-primary {
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+  color: white;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+.pricing-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials {
+  padding: 100px 24px;
+  background: var(--gray-50);
+}
+.testimonials-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.testimonial-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  border: 1px solid var(--gray-100);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.testimonial-stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+  color: #facc15;
+}
+.testimonial-stars svg {
+  width: 18px;
+  height: 18px;
+}
+.testimonial-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--gray-600);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+}
+.testimonial-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+.testimonial-role {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+/* ===== FAQ ===== */
+.faq {
+  padding: 100px 24px;
+  background: white;
+}
+.faq-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.faq-item {
+  border-bottom: 1px solid var(--gray-100);
+}
+.faq-question {
+  width: 100%;
+  padding: 20px 0;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.faq-question:hover { color: var(--emerald-600); }
+.faq-question svg {
+  width: 20px;
+  height: 20px;
+  color: var(--gray-400);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+.faq-item.open .faq-question svg {
+  transform: rotate(180deg);
+  color: var(--emerald-500);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.faq-item.open .faq-answer {
+  max-height: 200px;
+  padding-bottom: 20px;
+}
+.faq-answer p {
+  font-size: 0.95rem;
+  color: var(--gray-500);
+  line-height: 1.7;
+}
+
+/* ===== CTA ===== */
+.cta-section {
+  padding: 100px 24px;
+  background: linear-gradient(135deg, var(--emerald-900), var(--emerald-950));
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+}
+.cta-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.cta-section h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.cta-section p {
+  font-size: 1.1rem;
+  color: var(--emerald-200);
+  margin-bottom: 36px;
+  line-height: 1.7;
+}
+.cta-section .btn-primary {
+  background: white;
+  color: var(--emerald-700);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+.cta-section .btn-primary:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 40px 24px;
+  border-top: 1px solid var(--gray-100);
+  background: white;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+.footer-brand a {
+  color: var(--emerald-600);
+  text-decoration: none;
+  font-weight: 600;
+}
+.footer-brand a:hover { text-decoration: underline; }
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+.footer-links a {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--emerald-600); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .steps-grid::before { display: none; }
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+  .nav-links { display: none; }
+  .tool-header { padding: 24px 20px 0; }
+  .tool-body { padding: 20px; }
+  .hero { padding: 120px 20px 60px; }
+}
+@media (max-width: 480px) {
+  .steps-grid { grid-template-columns: 1fr; }
+  .tone-options { flex-direction: column; }
+  .hero-buttons { flex-direction: column; align-items: center; }
+  .social-proof { flex-direction: column; gap: 12px; }
+  .social-proof-divider { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">R</div>
+      ReplyPro
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#tool">Try Free</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#tool" class="nav-cta">Generate Reply</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Free to try — no signup needed
+    </div>
+    <h1>Never struggle with review responses again. <span>AI-crafted replies in seconds.</span></h1>
+    <p>Turn every Google review into an opportunity. Professional, on-brand replies generated instantly — so you can focus on running your business.</p>
+    <div class="hero-buttons">
+      <a href="#tool" class="btn-primary">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generate Free Reply
+      </a>
+      <a href="#how-it-works" class="btn-secondary">
+        See How It Works
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+      </a>
+    </div>
+    <div class="social-proof">
+      <div class="social-proof-item">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+        <span>No API key needed</span>
+      </div>
+      <div class="social-proof-divider"></div>
+      <div class="social-proof-item">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+        <span>Works instantly</span>
+      </div>
+      <div class="social-proof-divider"></div>
+      <div class="social-proof-item">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+        <span>5 free replies/month</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+  <div class="section-header animate-in">
+    <div class="section-label">How It Works</div>
+    <h2>Perfect review replies in four simple steps</h2>
+    <p>No complicated setup. No learning curve. Just paste, click, and reply.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card animate-in">
+      <div class="step-number">1</div>
+      <div class="step-icon">📋</div>
+      <h3>Paste the Review</h3>
+      <p>Copy the customer review from Google and paste it into ReplyPro</p>
+    </div>
+    <div class="step-card animate-in">
+      <div class="step-number">2</div>
+      <div class="step-icon">🎯</div>
+      <h3>Select Your Tone</h3>
+      <p>Choose Professional, Warm & Friendly, or Brief & Direct</p>
+    </div>
+    <div class="step-card animate-in">
+      <div class="step-number">3</div>
+      <div class="step-icon">✨</div>
+      <h3>Get Perfect Replies</h3>
+      <p>AI generates two polished response options customized to the review</p>
+    </div>
+    <div class="step-card animate-in">
+      <div class="step-number">4</div>
+      <div class="step-icon">🚀</div>
+      <h3>Copy & Paste</h3>
+      <p>Pick your favorite, copy it, and paste directly into Google</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOOL -->
+<section class="tool-section" id="tool">
+  <div class="section-header animate-in">
+    <div class="section-label">Try It Now</div>
+    <h2>Generate your reply</h2>
+    <p>Paste any Google review below and get a professional reply in seconds.</p>
+  </div>
+  <div class="tool-container">
+    <div class="tool-card animate-in">
+      <div class="tool-header">
+        <div class="tool-title">
+          <div class="tool-title-icon">✍️</div>
+          Reply Generator
+        </div>
+        <div class="replies-counter" id="repliesCounter">
+          <span class="replies-counter-dot"></span>
+          <span id="repliesText">5 free replies remaining</span>
+        </div>
+      </div>
+      <div class="tool-body">
+        <!-- Business name -->
+        <div class="business-name-group">
+          <label class="form-label">Your Business Name <span>(optional — personalizes the reply)</span></label>
+          <input type="text" class="business-name-input" id="businessName" placeholder="e.g. Sunrise Dental, The Corner Cafe" />
+        </div>
+
+        <!-- Review textarea -->
+        <div class="form-group">
+          <label class="form-label">Customer Review</label>
+          <textarea id="reviewInput" placeholder="Paste the Google review here...&#10;&#10;Example: &quot;Had an amazing experience at this restaurant! The pasta was incredible and our server Jake was so attentive. Will definitely be coming back with friends.&quot;"></textarea>
+        </div>
+
+        <!-- Star rating -->
+        <div class="form-group">
+          <label class="form-label">Star Rating</label>
+          <div class="star-rating" id="starRating">
+            <button class="star-btn" data-rating="1" aria-label="1 star">
+              <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg class="star-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+            <button class="star-btn" data-rating="2" aria-label="2 stars">
+              <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg class="star-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+            <button class="star-btn" data-rating="3" aria-label="3 stars">
+              <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg class="star-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+            <button class="star-btn" data-rating="4" aria-label="4 stars">
+              <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg class="star-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+            <button class="star-btn" data-rating="5" aria-label="5 stars">
+              <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg class="star-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+            <span class="star-rating-label" id="starLabel">Select rating</span>
+          </div>
+        </div>
+
+        <!-- Tone selector -->
+        <div class="form-group">
+          <label class="form-label">Response Tone</label>
+          <div class="tone-options" id="toneOptions">
+            <div class="tone-option selected" data-tone="professional">
+              <div class="tone-option-check">
+                <svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="tone-option-icon">💼</div>
+              <div class="tone-option-label">Professional</div>
+            </div>
+            <div class="tone-option" data-tone="warm">
+              <div class="tone-option-check">
+                <svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="tone-option-icon">😊</div>
+              <div class="tone-option-label">Warm & Friendly</div>
+            </div>
+            <div class="tone-option" data-tone="brief">
+              <div class="tone-option-check">
+                <svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="tone-option-icon">⚡</div>
+              <div class="tone-option-label">Brief & Direct</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate button -->
+        <button class="generate-btn" id="generateBtn" onclick="generateReply()">
+          <span class="btn-text">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Generate Reply
+          </span>
+          <span class="btn-loader">
+            <span class="btn-loader-dot"></span>
+            <span class="btn-loader-dot"></span>
+            <span class="btn-loader-dot"></span>
+          </span>
+        </button>
+
+        <!-- Messages -->
+        <div class="tool-message" id="toolMessage"></div>
+
+        <!-- Output -->
+        <div class="output-section" id="outputSection">
+          <div class="output-divider"></div>
+          <div class="output-label">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Your Generated Replies
+          </div>
+          <div id="repliesOutput"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-header animate-in">
+    <div class="section-label">Pricing</div>
+    <h2>Simple, transparent pricing</h2>
+    <p>Start free. Upgrade when you need unlimited replies.</p>
+  </div>
+  <div class="pricing-grid">
+    <!-- Free -->
+    <div class="pricing-card animate-in">
+      <h3>Free</h3>
+      <div class="pricing-amount">
+        <span class="currency">$</span>
+        <span class="amount">0</span>
+        <span class="period">/month</span>
+      </div>
+      <p class="pricing-desc">Perfect for trying out ReplyPro and handling occasional reviews.</p>
+      <ul class="pricing-features">
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          5 replies per month
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          All tone options
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          2 reply options per review
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          No signup required
+        </li>
+      </ul>
+      <a href="#tool" class="pricing-btn pricing-btn-outline">Start Free</a>
+    </div>
+    <!-- Pro -->
+    <div class="pricing-card featured animate-in">
+      <div class="pricing-badge">Most Popular</div>
+      <h3>Pro</h3>
+      <div class="pricing-amount">
+        <span class="currency">$</span>
+        <span class="amount">9</span>
+        <span class="period">/month</span>
+      </div>
+      <p class="pricing-desc">For businesses that take their online reputation seriously.</p>
+      <ul class="pricing-features">
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          <strong>Unlimited</strong> replies per month
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          Custom business name in every reply
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          Priority support
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          All tone options + future updates
+        </li>
+      </ul>
+      <a href="mailto:mira@zensta.work?subject=ReplyPro%20Pro%20%E2%80%94%20I%27d%20like%20to%20upgrade&body=Hi%2C%20I%27d%20like%20to%20upgrade%20to%20ReplyPro%20Pro.%0A%0AMy%20business%20name%3A%20%0AMonthly%20review%20volume%3A%20%0A%0AThanks!" class="pricing-btn pricing-btn-primary">Buy Pro — $9/mo</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="section-header animate-in">
+    <div class="section-label">Testimonials</div>
+    <h2>Loved by small business owners</h2>
+    <p>See how ReplyPro is transforming online reputation management.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card animate-in">
+      <div class="testimonial-stars">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <p class="testimonial-text">"I used to spend 30 minutes crafting responses to negative reviews, stressing over every word. Now I paste it into ReplyPro and get something better than I could write in 5 seconds. Game-changer for my dental practice."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">DR</div>
+        <div>
+          <div class="testimonial-name">Dr. Rachel Simmons</div>
+          <div class="testimonial-role">Owner, Bright Smile Dental — Austin, TX</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card animate-in">
+      <div class="testimonial-stars">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <p class="testimonial-text">"We get 15-20 Google reviews a week across three locations. My manager used to spend hours replying. Now she uses ReplyPro and knocks them all out during her morning coffee. The replies actually sound more thoughtful than what we were writing manually."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">MK</div>
+        <div>
+          <div class="testimonial-name">Marcus Kim</div>
+          <div class="testimonial-role">Owner, Seoul Kitchen (3 locations) — Portland, OR</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card animate-in">
+      <div class="testimonial-stars">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <p class="testimonial-text">"Honestly, I was ignoring most of my reviews because I didn't know what to say. ReplyPro fixed that completely. My Google rating went from 4.1 to 4.6 in two months just because I started replying consistently. Can't recommend it enough."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">LT</div>
+        <div>
+          <div class="testimonial-name">Lisa Torres</div>
+          <div class="testimonial-role">Owner, Glow Beauty Bar — Miami, FL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="section-header animate-in">
+    <div class="section-label">FAQ</div>
+    <h2>Frequently asked questions</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item animate-in">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Does this use AI / ChatGPT?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="faq-answer"><p>ReplyPro uses smart language templates that analyze the content of each review and craft contextually appropriate responses. No API key or external AI service needed — it works entirely in your browser, instantly and privately.</p></div>
+    </div>
+    <div class="faq-item animate-in">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Are the replies unique each time?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="faq-answer"><p>Yes. Each reply is dynamically constructed based on the specific review content, star rating, and your chosen tone. The system extracts topics, names, and sentiments from the review to create personalized responses.</p></div>
+    </div>
+    <div class="faq-item animate-in">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Is my data private?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="faq-answer"><p>100%. Everything runs in your browser. No review text is ever sent to a server. Your data never leaves your device. We only use localStorage to track your free reply count.</p></div>
+    </div>
+    <div class="faq-item animate-in">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        What happens after I use my 5 free replies?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="faq-answer"><p>Your free replies reset at the start of each month. Need more? Upgrade to Pro for $9/month and get unlimited replies plus priority support.</p></div>
+    </div>
+    <div class="faq-item animate-in">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Can I use this for Yelp or other review platforms?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="faq-answer"><p>Absolutely. While we designed ReplyPro with Google reviews in mind, the generated replies work perfectly for Yelp, TripAdvisor, Facebook reviews, or any other platform.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-content animate-in">
+    <h2>Start replying to reviews like a pro</h2>
+    <p>Join hundreds of small businesses that save hours every week with AI-powered review replies.</p>
+    <a href="#tool" class="btn-primary">
+      Try Free — No Signup
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      Built by <a href="https://zensta.work" target="_blank" rel="noopener">Zensta</a> — AI tools for small businesses
+    </div>
+    <div class="footer-links">
+      <a href="https://zensta.work" target="_blank" rel="noopener">zensta.work</a>
+      <a href="mailto:mira@zensta.work">Contact</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===== STATE =====
+let selectedRating = 0;
+let selectedTone = 'professional';
+
+// ===== LOCALSTORAGE USAGE TRACKING =====
+function getUsageData() {
+  const raw = localStorage.getItem('replypro_usage');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function getCurrentMonth() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function getRemainingReplies() {
+  const data = getUsageData();
+  const month = getCurrentMonth();
+  if (!data || data.month !== month) {
+    // New month or first use — reset
+    const fresh = { month: month, used: 0 };
+    localStorage.setItem('replypro_usage', JSON.stringify(fresh));
+    return 5;
+  }
+  return Math.max(0, 5 - data.used);
+}
+
+function decrementReply() {
+  const month = getCurrentMonth();
+  let data = getUsageData();
+  if (!data || data.month !== month) {
+    data = { month: month, used: 0 };
+  }
+  data.used += 1;
+  localStorage.setItem('replypro_usage', JSON.stringify(data));
+}
+
+function updateCounter() {
+  const remaining = getRemainingReplies();
+  const counter = document.getElementById('repliesCounter');
+  const text = document.getElementById('repliesText');
+  if (remaining === 0) {
+    text.textContent = '0 free replies remaining';
+    counter.classList.add('depleted');
+  } else {
+    text.textContent = remaining + ' free repl' + (remaining === 1 ? 'y' : 'ies') + ' remaining';
+    counter.classList.remove('depleted');
+  }
+}
+
+// ===== STAR RATING =====
+document.querySelectorAll('.star-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const rating = parseInt(btn.dataset.rating);
+    selectedRating = rating;
+    document.querySelectorAll('.star-btn').forEach(b => {
+      const r = parseInt(b.dataset.rating);
+      if (r <= rating) { b.classList.add('active'); }
+      else { b.classList.remove('active'); }
+    });
+    const labels = { 1: 'Terrible', 2: 'Poor', 3: 'Average', 4: 'Good', 5: 'Excellent' };
+    const label = document.getElementById('starLabel');
+    label.textContent = rating + ' star' + (rating > 1 ? 's' : '') + ' — ' + labels[rating];
+    label.style.color = rating >= 4 ? 'var(--emerald-600)' : rating === 3 ? '#d97706' : '#dc2626';
+  });
+});
+
+// ===== TONE SELECTOR =====
+document.querySelectorAll('.tone-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.tone-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedTone = opt.dataset.tone;
+  });
+});
+
+// ===== TOPIC EXTRACTION =====
+function extractTopics(text) {
+  const lower = text.toLowerCase();
+  const topics = [];
+  const topicPatterns = {
+    service: /\b(service|served|serving|customer service|hospitality)\b/i,
+    staff: /\b(staff|team|employee|server|waiter|waitress|receptionist|hygienist|technician|barista|stylist|therapist|doctor|dentist|nurse|manager|host|hostess|crew)\b/i,
+    food: /\b(food|meal|dish|dishes|menu|breakfast|lunch|dinner|appetizer|entree|dessert|pasta|pizza|burger|steak|sushi|salad|soup|sandwich|coffee|drink|cocktail|wine|beer)\b/i,
+    atmosphere: /\b(atmosphere|ambiance|ambience|vibe|decor|decoration|interior|cozy|cosy|comfortable|setting|environment|music|lighting|aesthetic)\b/i,
+    wait_time: /\b(wait|waiting|waited|slow|fast|quick|speed|speedy|prompt|long time|forever|took forever|hour|minutes)\b/i,
+    quality: /\b(quality|excellent|amazing|incredible|outstanding|fantastic|wonderful|superb|mediocre|subpar|poor quality|top.?notch|first.?class|world.?class)\b/i,
+    price: /\b(price|pricing|expensive|cheap|affordable|overpriced|value|worth|cost|money|bill|pricey|reasonable|budget)\b/i,
+    cleanliness: /\b(clean|dirty|filthy|spotless|hygiene|sanitary|mess|messy|tidy|neat|pristine)\b/i,
+    location: /\b(location|parking|accessible|convenient|find|easy to find|neighborhood|area)\b/i,
+    experience: /\b(experience|visit|time|trip|came|went|been)\b/i,
+    recommendation: /\b(recommend|recommended|suggestion|suggest|tell everyone|highly recommend)\b/i,
+    return_intent: /\b(come back|coming back|return|returning|visit again|next time|be back|definitely back)\b/i,
+  };
+
+  for (const [topic, pattern] of Object.entries(topicPatterns)) {
+    if (pattern.test(lower)) {
+      topics.push(topic);
+    }
+  }
+  return topics;
+}
+
+function extractStaffNames(text) {
+  // Look for common patterns: "our server Jake", "Jake was", staff name patterns
+  const patterns = [
+    /(?:server|waiter|waitress|barista|stylist|receptionist|hostess|host|hygienist|nurse|technician|doctor|dentist|manager|therapist|staff member|team member)\s+([A-Z][a-z]+)/g,
+    /([A-Z][a-z]+)\s+(?:was\s+(?:so|very|really|incredibly|super|extremely|absolutely)\s+(?:helpful|nice|kind|friendly|attentive|professional|great|amazing|wonderful|awesome|patient|knowledgeable|thorough|sweet|lovely))/g,
+    /(?:shout\s*(?:out|.out)\s+(?:to)\s+)([A-Z][a-z]+)/gi,
+    /(?:thanks?\s+(?:to)\s+)([A-Z][a-z]+)/gi,
+    /(?:kudos\s+(?:to)\s+)([A-Z][a-z]+)/gi,
+    /(?:especially|particularly)\s+([A-Z][a-z]+)/g,
+  ];
+  const names = new Set();
+  for (const pattern of patterns) {
+    let match;
+    const regex = new RegExp(pattern.source, pattern.flags);
+    while ((match = regex.exec(text)) !== null) {
+      const name = match[1];
+      // Filter out common false positives
+      const skipWords = new Set(['The','This','That','They','Their','There','Then','Very','Really','Super','Just','Great','Amazing','Our','She','Her','His','Him','Also','Would','Could','Even','Been','Made','Much','Such','Some','Only','Well','Best','Most','Back','Over','After','Before','Every','Still','Never','Always','About','Here','Will','Have','Been','More','Next','Last','First','Each','Many','Good','Nice','Highly','Definitely','Absolutely','Incredibly','Extremely','Totally','Honestly','Literally','Seriously','Everything','Everyone','Excellent','Outstanding','Wonderful','Fantastic','Terrible','Horrible','Awful','Beautiful','Friendly','Professional','Recommend','Recently','Absolutely','Unfortunately']);
+      if (!skipWords.has(name) && name.length > 1 && name.length < 15) {
+        names.add(name);
+      }
+    }
+  }
+  return Array.from(names);
+}
+
+function extractReviewerName(text) {
+  // Check for signed reviews: "- John", "— Sarah M.", "Cheers, Mike"
+  const signPatterns = [
+    /(?:^|\n)\s*[-—]\s*([A-Z][a-z]+(?:\s+[A-Z]\.?)?)\s*$/,
+    /(?:cheers|regards|sincerely|thanks|best)[,.]?\s*\n?\s*([A-Z][a-z]+(?:\s+[A-Z]\.?)?)\s*$/i,
+    /(?:^|\n)\s*([A-Z][a-z]+(?:\s+[A-Z]\.?)?)\s*$/,
+  ];
+  for (const pattern of signPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const name = match[1].trim();
+      const skip = new Set(['Thanks','Cheers','Regards','Sincerely','Best','Good','Great','Terrible','Horrible','Never','Would','Will','Overall','Highly','Definitely']);
+      if (!skip.has(name) && name.length > 1 && name.length < 20) {
+        return name;
+      }
+    }
+  }
+  return null;
+}
+
+function extractSpecificPraises(text) {
+  const lower = text.toLowerCase();
+  const praises = [];
+  // Extract quoted items or specific menu items / services mentioned positively
+  const positiveContext = /(?:loved?|amazing|incredible|fantastic|excellent|best|great|wonderful|perfect|outstanding|delicious|fabulous)\s+(.{3,40?)(?:[.!,]|$)/gi;
+  let m;
+  while ((m = positiveContext.exec(lower)) !== null) {
+    praises.push(m[1].trim().replace(/[.!,]+$/, ''));
+  }
+  return praises.slice(0, 3);
+}
+
+// ===== REPLY GENERATION ENGINE =====
+function generateReplies(reviewText, rating, tone, businessName) {
+  const topics = extractTopics(reviewText);
+  const staffNames = extractStaffNames(reviewText);
+  const reviewerName = extractReviewerName(reviewText);
+  const praises = extractSpecificPraises(reviewText);
+
+  const biz = businessName ? businessName : 'our team';
+  const bizAt = businessName ? 'at ' + businessName : 'with us';
+  const bizOf = businessName ? 'at ' + businessName : 'here';
+  const fromBiz = businessName ? '\n\n— The ' + businessName + ' Team' : '';
+
+  const greeting = reviewerName ? ('Hi ' + reviewerName + ', ') : '';
+  const greetingWarm = reviewerName ? ('Hey ' + reviewerName + '! ') : '';
+  const greetingDear = reviewerName ? ('Dear ' + reviewerName + ', ') : '';
+
+  // Build staff mention
+  let staffMention = '';
+  if (staffNames.length > 0) {
+    if (staffNames.length === 1) {
+      staffMention = staffNames[0];
+    } else {
+      staffMention = staffNames.slice(0, -1).join(', ') + ' and ' + staffNames[staffNames.length - 1];
+    }
+  }
+
+  // Build topic-aware sentences
+  function getTopicSentence(sentiment) {
+    const sentences = [];
+    if (sentiment === 'positive') {
+      if (topics.includes('food')) sentences.push('We\'re thrilled you enjoyed the food');
+      if (topics.includes('service')) sentences.push('It\'s wonderful to hear our service met your expectations');
+      if (topics.includes('staff') && staffMention) sentences.push('We\'ll be sure to pass along your kind words to ' + staffMention);
+      else if (topics.includes('staff')) sentences.push('Our team works hard to create great experiences, so this means the world to them');
+      if (topics.includes('atmosphere')) sentences.push('We put a lot of thought into creating the right atmosphere, so we\'re glad you noticed');
+      if (topics.includes('quality')) sentences.push('Quality is at the heart of everything we do');
+      if (topics.includes('cleanliness')) sentences.push('We take pride in maintaining a clean, welcoming space');
+      if (topics.includes('price')) sentences.push('We work hard to deliver great value');
+    } else if (sentiment === 'mixed') {
+      if (topics.includes('wait_time')) sentences.push('We understand that wait times can be frustrating, and we\'re actively working to improve our efficiency');
+      if (topics.includes('service')) sentences.push('We hold our service to a high standard, and we\'re sorry we fell short of that during your visit');
+      if (topics.includes('food')) sentences.push('We want every dish to be exceptional, and we appreciate knowing when we miss the mark');
+      if (topics.includes('price')) sentences.push('We\'re always evaluating our pricing to ensure it reflects the value we provide');
+      if (topics.includes('cleanliness')) sentences.push('Cleanliness is non-negotiable for us, and we\'re looking into the concerns you raised');
+      if (topics.includes('staff')) sentences.push('We\'ll be addressing this with our team to ensure a better experience next time');
+      if (topics.includes('atmosphere')) sentences.push('We appreciate the feedback on our space and are always looking for ways to improve');
+    } else {
+      if (topics.includes('wait_time')) sentences.push('Long wait times are unacceptable to us, and we sincerely apologize. We are reviewing our processes to ensure this doesn\'t happen again');
+      if (topics.includes('service')) sentences.push('The level of service you described is not representative of who we are, and we\'re taking immediate steps to address this');
+      if (topics.includes('food')) sentences.push('We\'re disappointed to hear the food didn\'t meet your expectations. This has been flagged with our kitchen team');
+      if (topics.includes('price')) sentences.push('We understand the frustration around pricing and want to make sure every visit feels worth it');
+      if (topics.includes('cleanliness')) sentences.push('Cleanliness is a top priority and we\'re investigating what went wrong during your visit');
+      if (topics.includes('staff') && staffMention) sentences.push('We\'re addressing the situation with ' + staffMention + ' directly');
+      else if (topics.includes('staff')) sentences.push('We\'re addressing the staff concerns you raised through additional training and oversight');
+      if (topics.includes('atmosphere')) sentences.push('We want everyone to feel comfortable here, and we\'re sorry the atmosphere didn\'t deliver that');
+    }
+    return sentences;
+  }
+
+  const replies = [];
+
+  // ===== 4-5 STAR REPLIES =====
+  if (rating >= 4) {
+    const topicLines = getTopicSentence('positive');
+    const topicBlock = topicLines.length > 0 ? topicLines.slice(0, 2).join('. ') + '.' : '';
+    const returnInvite = topics.includes('return_intent')
+      ? 'We can\'t wait to welcome you back!'
+      : 'We hope to see you again soon!';
+    const staffLine = (staffMention && !topicBlock.includes(staffMention))
+      ? ' We\'ll make sure ' + staffMention + ' hears about this — it\'ll make their day!'
+      : '';
+
+    if (tone === 'professional') {
+      replies.push(
+        greeting + 'Thank you so much for taking the time to share this wonderful feedback. We\'re delighted to hear you had such a positive experience ' + bizAt + '. ' + topicBlock + (topicBlock ? ' ' : '') + staffLine + (staffLine ? ' ' : '') + 'Your satisfaction is our top priority, and reviews like yours motivate our entire team. ' + returnInvite + fromBiz
+      );
+      replies.push(
+        greeting + 'We truly appreciate your generous review! It means a great deal to know that your experience ' + bizAt + ' exceeded expectations. ' + topicBlock + (topicBlock ? ' ' : '') + staffLine + (staffLine ? ' ' : '') + 'We\'re committed to maintaining the high standards you experienced. Thank you for choosing ' + (businessName || 'us') + ', and we look forward to welcoming you back.' + fromBiz
+      );
+    } else if (tone === 'warm') {
+      replies.push(
+        greetingWarm + 'Wow, this review absolutely made our day! 😊 We\'re SO happy you had a great time ' + bizAt + '. ' + topicBlock + (topicBlock ? ' ' : '') + staffLine + (staffLine ? ' ' : '') + 'You\'re exactly the kind of customer we love having — and we can\'t wait to see you again! Thanks for spreading the love. ❤️' + fromBiz
+      );
+      replies.push(
+        (greetingWarm || 'Hey there! ') + 'Reading this just put a huge smile on our faces! Thank you for such kind words about your visit ' + bizOf + '. ' + topicBlock + (topicBlock ? ' ' : '') + staffLine + (staffLine ? ' ' : '') + 'It\'s customers like you that make what we do feel worthwhile. ' + returnInvite + ' We\'ll have everything ready for you! 🎉' + fromBiz
+      );
+    } else {
+      // Brief & Direct
+      replies.push(
+        (greeting || '') + 'Thank you for the great review! ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + staffLine + (staffLine ? ' ' : '') + 'Glad you enjoyed your visit. ' + returnInvite + fromBiz
+      );
+      replies.push(
+        (greeting || '') + 'Really appreciate the kind words! ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + staffLine + (staffLine ? ' ' : '') + 'Thanks for choosing ' + (businessName || 'us') + ' — see you next time!' + fromBiz
+      );
+    }
+  }
+
+  // ===== 3 STAR REPLIES =====
+  else if (rating === 3) {
+    const topicLines = getTopicSentence('mixed');
+    const topicBlock = topicLines.length > 0 ? topicLines.slice(0, 2).join('. ') + '.' : '';
+
+    if (tone === 'professional') {
+      replies.push(
+        greeting + 'Thank you for your honest feedback. We appreciate you taking the time to share your experience ' + bizAt + '. While we\'re glad there were aspects you enjoyed, we clearly have room for improvement. ' + topicBlock + (topicBlock ? ' ' : '') + 'Your input helps us grow, and we\'d love the opportunity to deliver a better experience next time. If you\'re open to it, please reach out to us directly so we can learn more about how we can improve.' + fromBiz
+      );
+      replies.push(
+        greeting + 'We value your candid review. A 3-star experience isn\'t what we aim for, and your feedback gives us a clear direction for improvement. ' + topicBlock + (topicBlock ? ' ' : '') + 'We\'re committed to addressing the areas where we fell short. We\'d genuinely appreciate another chance to show you what ' + (businessName || 'we') + ' can deliver at our best. Thank you for helping us get better.' + fromBiz
+      );
+    } else if (tone === 'warm') {
+      replies.push(
+        (greetingWarm || 'Hey there, ') + 'Thanks for keeping it real with us! We appreciate the honesty — it\'s how we get better. ' + topicBlock + (topicBlock ? ' ' : '') + 'We really want to get this right for you. Would you give us another shot? We\'d love to turn that 3 into a 5 next time! 💪' + fromBiz
+      );
+      replies.push(
+        greeting + 'We appreciate you sharing your thoughts! Honest feedback like this is actually a gift — it helps us see where we can step up. ' + topicBlock + (topicBlock ? ' ' : '') + 'We\'re on it, and we\'d love a chance to wow you on your next visit. We promise to bring our A-game! 🙌' + fromBiz
+      );
+    } else {
+      replies.push(
+        (greeting || '') + 'Thanks for the feedback. We hear you — there\'s room to improve. ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + 'We\'d love a chance to do better next time.' + fromBiz
+      );
+      replies.push(
+        (greeting || '') + 'Appreciate the honest review. We take this kind of feedback seriously. ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + 'Hope to earn a higher rating on your next visit.' + fromBiz
+      );
+    }
+  }
+
+  // ===== 1-2 STAR REPLIES =====
+  else {
+    const topicLines = getTopicSentence('negative');
+    const topicBlock = topicLines.length > 0 ? topicLines.slice(0, 2).join('. ') + '.' : '';
+    const contactLine = businessName
+      ? 'Please don\'t hesitate to contact us directly so we can make this right.'
+      : 'Please reach out to us directly — we want to make this right.';
+
+    if (tone === 'professional') {
+      replies.push(
+        (greetingDear || greeting || '') + 'We sincerely apologize for the experience you\'ve described. This is not the standard we hold ourselves to ' + bizAt + ', and we take your feedback very seriously. ' + topicBlock + (topicBlock ? ' ' : '') + 'We would appreciate the opportunity to speak with you directly to understand what went wrong and to make it right. ' + contactLine + ' Your satisfaction matters deeply to us, and we are committed to ensuring this does not happen again.' + fromBiz
+      );
+      replies.push(
+        (greetingDear || greeting || '') + 'Thank you for bringing this to our attention. We are truly sorry that your experience ' + bizAt + ' did not meet your expectations — or ours. ' + topicBlock + (topicBlock ? ' ' : '') + 'We have shared your feedback with our management team and are taking immediate steps to address the issues you\'ve raised. We would welcome the chance to discuss this further and find a way to make things right. ' + contactLine + fromBiz
+      );
+    } else if (tone === 'warm') {
+      replies.push(
+        (greetingWarm || greeting || 'Hi there, ') + 'We\'re really sorry to hear about your experience. This isn\'t who we are, and reading your review genuinely bothers us because we want every single person to leave happy. ' + topicBlock + (topicBlock ? ' ' : '') + 'We messed up, and we own that. Could we get a chance to make it up to you? We\'d love to connect directly and figure out how to turn this around. Your experience matters to us — truly. 💙' + fromBiz
+      );
+      replies.push(
+        (greeting || 'Hey, ') + 'First off — we\'re sorry. Full stop. You deserved better than what you got, and we know it. ' + topicBlock + (topicBlock ? ' ' : '') + 'We\'re not going to make excuses. We\'re going to fix it. If you\'re willing, we\'d love to hear from you directly so we can make things right. Everyone deserves a great experience ' + bizOf + ', and we want to give you one. 🙏' + fromBiz
+      );
+    } else {
+      replies.push(
+        (greeting || '') + 'We\'re sorry about your experience. This isn\'t our standard. ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + 'We want to make this right — please reach out to us directly.' + fromBiz
+      );
+      replies.push(
+        (greeting || '') + 'We apologize. Your feedback has been shared with our team. ' + (topicLines.length > 0 ? topicLines[0] + '. ' : '') + 'Please contact us so we can resolve this for you.' + fromBiz
+      );
+    }
+  }
+
+  // Clean up any double spaces
+  return replies.map(r => r.replace(/\s{2,}/g, ' ').trim());
+}
+
+// ===== MAIN GENERATE FUNCTION =====
+function generateReply() {
+  const reviewText = document.getElementById('reviewInput').value.trim();
+  const businessName = document.getElementById('businessName').value.trim();
+  const btn = document.getElementById('generateBtn');
+  const msgEl = document.getElementById('toolMessage');
+  const outputSection = document.getElementById('outputSection');
+
+  // Reset messages
+  msgEl.className = 'tool-message';
+  msgEl.style.display = 'none';
+  outputSection.classList.remove('visible');
+
+  // Validate
+  if (!reviewText) {
+    showMessage('Please paste a customer review to generate a reply.', 'error');
+    return;
+  }
+  if (reviewText.length < 10) {
+    showMessage('The review seems too short. Please paste the full review text.', 'error');
+    return;
+  }
+  if (selectedRating === 0) {
+    showMessage('Please select a star rating for this review.', 'error');
+    return;
+  }
+
+  // Check remaining replies
+  const remaining = getRemainingReplies();
+  if (remaining <= 0) {
+    showMessage('You\'ve used all 5 free replies this month. Upgrade to Pro for unlimited replies!', 'warning');
+    return;
+  }
+
+  // Show loading state
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Simulate brief processing delay for polish
+  setTimeout(() => {
+    const replies = generateReplies(reviewText, selectedRating, selectedTone, businessName);
+
+    // Decrement counter
+    decrementReply();
+    updateCounter();
+
+    // Show output
+    const output = document.getElementById('repliesOutput');
+    output.innerHTML = '';
+
+    replies.forEach((reply, i) => {
+      const card = document.createElement('div');
+      card.className = 'reply-card';
+      card.style.animationDelay = (i * 0.15) + 's';
+      card.innerHTML = `
+        <div class="reply-card-header">
+          <span class="reply-option-label">Option ${i + 1}</span>
+          <button class="copy-btn" onclick="copyReply(this, ${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="reply-text">${escapeHtml(reply)}</div>
+      `;
+      output.appendChild(card);
+    });
+
+    outputSection.classList.add('visible');
+
+    // Show success message if low on replies
+    const newRemaining = getRemainingReplies();
+    if (newRemaining <= 2 && newRemaining > 0) {
+      showMessage('Only ' + newRemaining + ' free repl' + (newRemaining === 1 ? 'y' : 'ies') + ' left this month. Upgrade to Pro for unlimited!', 'info');
+    }
+
+    // Reset button
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    // Scroll to output
+    setTimeout(() => {
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
+  }, 800 + Math.random() * 600);
+}
+
+function showMessage(text, type) {
+  const msgEl = document.getElementById('toolMessage');
+  msgEl.textContent = text;
+  msgEl.className = 'tool-message visible ' + type;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function copyReply(btn, index) {
+  const replyCards = document.querySelectorAll('.reply-text');
+  const text = replyCards[index].textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      Copied!
+    `;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy
+      `;
+    }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      Copied!
+    `;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy
+      `;
+    }, 2000);
+  });
+}
+
+// ===== FAQ TOGGLE =====
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  // Open clicked (if wasn't open)
+  if (!isOpen) item.classList.add('open');
+}
+
+// ===== SCROLL ANIMATIONS =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+// ===== NAV SCROLL =====
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  if (window.scrollY > 20) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+});
+
+// ===== INIT =====
+updateCounter();
+</script>
+</body>
+</html>
