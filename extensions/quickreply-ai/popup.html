@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickReply AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 340px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #fff;
+      color: #1f2937;
+    }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      padding: 20px 24px;
+      color: #fff;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    /* ── Content ─────────────────────────────────────────────────── */
+    .content {
+      padding: 20px 24px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #166534;
+    }
+
+    /* ── Instructions ────────────────────────────────────────────── */
+    .instructions {
+      margin-bottom: 16px;
+    }
+
+    .instructions h2 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4f46e5;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .step:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: #eef2ff;
+      color: #4f46e5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #374151;
+      padding-top: 2px;
+    }
+
+    /* ── Features ─────────────────────────────────────────────────── */
+    .features {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .features h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #374151;
+    }
+
+    .feature-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature-icon {
+      font-size: 14px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    .footer {
+      padding: 12px 24px 16px;
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .footer-link {
+      font-size: 11px;
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Gmail-only notice ────────────────────────────────────────── */
+    .notice {
+      display: none;
+      padding: 14px 16px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .notice-text {
+      font-size: 12px;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    .notice.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>QuickReply AI</h1>
+    <p>Professional email replies in one click</p>
+  </div>
+
+  <div class="content">
+    <div class="status" id="status">
+      <div class="status-dot"></div>
+      <span class="status-text">Active on Gmail</span>
+    </div>
+
+    <div class="notice" id="notice">
+      <div class="notice-text">
+        Navigate to <strong>mail.google.com</strong> to use QuickReply AI. Open any email and look for the purple button in the bottom-right corner.
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h2>How it works</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Open any email in Gmail</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Click the purple <strong>QuickReply</strong> button (bottom-right corner)</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Choose your tone: Professional, Friendly, or Quick</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Copy to clipboard or insert directly into your reply</div>
+      </div>
+    </div>
+
+    <div class="features">
+      <h3>Smart Detection</h3>
+      <div class="feature-row">
+        <span class="feature-icon">&#128197;</span>
+        <span>Meeting & scheduling requests</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">&#10067;</span>
+        <span>Questions & information requests</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">&#128176;</span>
+        <span>Invoices & payment messages</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">&#128101;</span>
+        <span>Introductions & networking</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">&#128172;</span>
+        <span>Follow-ups, feedback, and more</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-text">v1.0 &mdash; No API key needed</span>
+    <a href="#" class="footer-link" id="rate-link">Rate this extension</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

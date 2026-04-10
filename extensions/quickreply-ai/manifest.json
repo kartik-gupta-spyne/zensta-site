@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "QuickReply AI",
+  "version": "1.0.0",
+  "description": "Instantly generate professional email replies with one click. No API key needed.",
+  "permissions": ["activeTab", "clipboardWrite"],
+  "host_permissions": ["https://mail.google.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}
